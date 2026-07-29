@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session 3 Build Lab — The Knowledge Layer</title>
+<style>
+  :root{
+    --navy:#0c2d5e; --navy-dark:#081d3f; --blue:#2d6cad; --blue-light:#eaf2fb;
+    --green:#2e9e52; --green-light:#eaf8ee; --orange:#e2622d; --orange-light:#fdeee7;
+    --gold:#e8a63d; --gold-light:#fdf3e1; --purple:#7c5cbf; --purple-light:#f0ebfa;
+    --red:#d64545; --red-light:#fdecec; --cyan:#1a9aa8; --cyan-light:#e6f6f8;
+    --ink:#1b2430; --muted:#5b6472; --line:#dfe4ea; --bg:#f4f6f9; --white:#fff;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.55;}
+  a{color:var(--blue);}
+
+  .hero{background:linear-gradient(135deg,var(--cyan) 0%,var(--navy-dark) 100%);color:#fff;
+    padding:34px 24px 26px;text-align:center;}
+  .hero .eyebrow{letter-spacing:2.5px;font-size:11.5px;color:#b6e4ea;font-weight:700;
+    text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:clamp(26px,4.6vw,40px);margin:0 0 8px;font-weight:800;}
+  .hero .tag{font-size:16px;color:#d6f0f3;margin-bottom:16px;}
+  .meta{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;font-size:13.5px;color:#cfe8ec;}
+  .meta b{color:#fff;}
+
+  /* role switcher */
+  .roles{background:#fff;border-bottom:1px solid var(--line);padding:12px;
+    display:flex;justify-content:center;gap:8px;flex-wrap:wrap;position:sticky;top:0;z-index:60;
+    box-shadow:0 2px 10px rgba(10,30,60,.06);}
+  .roles .lbl{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--muted);
+    align-self:center;text-transform:uppercase;margin-right:4px;}
+  .rolebtn{border:2px solid var(--line);background:#fff;color:var(--muted);font-weight:700;
+    font-size:13px;padding:8px 16px;border-radius:22px;cursor:pointer;transition:all .15s;}
+  .rolebtn:hover{border-color:var(--blue);color:var(--blue);}
+  .rolebtn.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+
+  .progwrap{background:var(--navy-dark);padding:10px 24px;}
+  .ptrack{max-width:900px;margin:0 auto;background:rgba(255,255,255,.14);border-radius:20px;height:9px;overflow:hidden;}
+  .pfill{background:linear-gradient(90deg,var(--gold),#8be0a5);height:100%;width:0%;
+    transition:width .4s ease;border-radius:20px;}
+  .ptext{text-align:center;font-size:12px;color:#cfdcf0;margin-top:7px;}
+
+  main{max-width:1000px;margin:0 auto;padding:28px 20px 70px;}
+  section{margin-bottom:38px;scroll-margin-top:80px;}
+  .shead{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+  .shead h2{font-size:22px;margin:0;}
+  .stepnum{width:34px;height:34px;border-radius:10px;background:var(--cyan);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;flex-shrink:0;}
+  .ssub{color:var(--muted);font-size:13.5px;font-style:italic;margin:0 0 16px 46px;}
+  .timebox{display:inline-block;background:var(--gold-light);color:#a76c1c;border-radius:6px;
+    padding:2px 9px;font-size:11.5px;font-weight:800;margin-left:8px;}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;
+    margin-bottom:16px;box-shadow:0 1px 3px rgba(10,30,60,.05);}
+  .card.theory{border-left:4px solid var(--cyan);}
+  .card.doit{border-left:4px solid var(--green);}
+  .card.warn{border-left:4px solid var(--red);}
+  .card h3{margin:0 0 8px;font-size:17px;}
+  .kicker{font-size:10.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+    color:var(--cyan);margin-bottom:6px;}
+  .kicker.g{color:var(--green);} .kicker.r{color:var(--red);} .kicker.o{color:#a76c1c;}
+
+  svg.fig{display:block;width:100%;height:auto;margin:14px 0 6px;}
+
+  ol.steps{margin:10px 0 0;padding-left:0;list-style:none;counter-reset:s;}
+  ol.steps li{counter-increment:s;position:relative;padding:9px 0 9px 38px;font-size:14.5px;
+    border-bottom:1px dashed var(--line);}
+  ol.steps li:last-child{border-bottom:none;}
+  ol.steps li::before{content:counter(s);position:absolute;left:0;top:9px;width:24px;height:24px;
+    border-radius:7px;background:var(--green-light);color:var(--green);font-weight:800;font-size:12.5px;
+    display:flex;align-items:center;justify-content:center;}
+
+  .work{margin-top:16px;}
+  .work label{display:block;font-size:12.5px;font-weight:800;color:var(--navy);
+    margin-bottom:5px;letter-spacing:.3px;}
+  .work textarea{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:11px;
+    font-family:inherit;font-size:13.5px;resize:vertical;min-height:80px;background:#fcfdfe;}
+  .work textarea:focus{outline:none;border-color:var(--blue);background:#fff;}
+  .work .hint{font-size:11.5px;color:var(--muted);margin-top:4px;}
+
+  .code{background:#0f1b2d;color:#dbe7f5;border-radius:11px;padding:16px 18px;
+    font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px;line-height:1.75;
+    overflow-x:auto;position:relative;white-space:pre-wrap;}
+  .code .h{color:#66d9a0;font-weight:700;}
+  .code .c{color:#7d8fa8;font-style:italic;}
+  .copybtn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.12);border:none;
+    color:#dbe7f5;font-size:11px;font-weight:700;padding:5px 11px;border-radius:6px;cursor:pointer;}
+  .copybtn:hover{background:rgba(255,255,255,.25);}
+  .codewrap{position:relative;margin-top:12px;}
+
+  .rolebox{display:none;}
+  .rolebox.on{display:block;}
+  .rolechip{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:1.2px;
+    padding:3px 10px;border-radius:20px;background:var(--purple-light);color:var(--purple);
+    text-transform:uppercase;margin-bottom:10px;}
+
+  .chk{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed var(--line);}
+  .chk:last-child{border-bottom:none;}
+  .chk input{margin-top:3px;width:18px;height:18px;accent-color:var(--green);flex-shrink:0;cursor:pointer;}
+  .chk label{cursor:pointer;font-size:14px;}
+  .chk.done label{color:#9aa4b2;text-decoration:line-through;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:760px){.grid2{grid-template-columns:1fr;}}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px;}
+  th{text-align:left;background:var(--navy);color:#fff;padding:9px 11px;font-size:11px;
+    letter-spacing:1.1px;text-transform:uppercase;}
+  th:first-child{border-radius:7px 0 0 0;} th:last-child{border-radius:0 7px 0 0;}
+  td{padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top;}
+  tr:nth-child(even) td{background:#fafbfd;}
+
+  .exportbar{position:fixed;bottom:0;left:0;right:0;background:var(--navy-dark);
+    padding:12px 20px;display:flex;justify-content:center;gap:12px;z-index:70;
+    box-shadow:0 -3px 14px rgba(0,0,0,.2);}
+  .exportbar button{border:none;border-radius:9px;padding:10px 20px;font-weight:800;
+    font-size:13.5px;cursor:pointer;}
+  .btn-primary{background:var(--green);color:#fff;}
+  .btn-primary:hover{background:#258443;}
+  .btn-ghost{background:rgba(255,255,255,.12);color:#fff;}
+  .btn-ghost:hover{background:rgba(255,255,255,.24);}
+  .savenote{color:#9db3d6;font-size:12px;align-self:center;}
+
+  footer{text-align:center;background:var(--navy-dark);color:#b9c9e4;font-size:12.5px;
+    padding:18px 18px 76px;}
+  footer a{color:#fff;}
+  ::selection{background:var(--gold);color:#1b2430;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">Talent Scout · AI Operator Cohort · Module 03</div>
+  <h1>The Knowledge Layer</h1>
+  <div class="tag">Stop Re-Explaining Your Job</div>
+  <div class="meta">
+    <span><b>90 min</b> build</span>
+    <span><b>4</b> build steps</span>
+    <span><b>3</b> deliverables</span>
+    <span>Works in class <b>or</b> as homework</span>
+  </div>
+</div>
+
+<div class="roles">
+  <span class="lbl">Your role</span>
+  <button class="rolebtn on" data-role="hr">◈ HR Scouting Exec</button>
+  <button class="rolebtn" data-role="ct">◉ Content &amp; Social</button>
+  <button class="rolebtn" data-role="pm">▣ Project Manager</button>
+</div>
+
+<div class="progwrap">
+  <div class="ptrack"><div class="pfill" id="pfill"></div></div>
+  <div class="ptext" id="ptext">0 of 0 complete</div>
+</div>
+
+<main>
+
+<!-- ===== THEORY ===== -->
+<section id="theory">
+  <div class="shead"><div class="stepnum" style="background:var(--cyan)">◆</div><h2>The Idea</h2></div>
+  <p class="ssub">Read this before you build. Four minutes.</p>
+
+  <div class="card theory">
+    <div class="kicker">Theory 01</div>
+    <h3>Three Places Knowledge Can Live</h3>
+    <p style="color:var(--muted);font-size:14.5px;margin:0">Every fact your AI uses comes from one of three places.
+       Only one of them scales — and most people only ever use the worst.</p>
+
+    <svg class="fig" viewBox="0 0 860 250" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Three knowledge layers: prompt, project knowledge, live connector">
+      <g>
+        <rect x="14" y="40" width="256" height="176" rx="13" fill="#fff" stroke="#d64545" stroke-width="2"/>
+        <circle cx="52" cy="76" r="18" fill="#fdecec"/>
+        <text x="52" y="83" fill="#d64545" font-size="16" font-weight="800" text-anchor="middle">01</text>
+        <text x="82" y="74" fill="#1b2430" font-size="15" font-weight="800">In the prompt</text>
+        <text x="82" y="92" fill="#8a9bb0" font-size="11">PASTE IT EVERY TIME</text>
+        <text x="36" y="126" fill="#5b6472" font-size="12.5">Accurate but exhausting.</text>
+        <text x="36" y="146" fill="#5b6472" font-size="12.5">Dies with the conversation.</text>
+        <rect x="36" y="164" width="212" height="34" rx="8" fill="#fdecec"/>
+        <text x="142" y="178" fill="#9b2c2c" font-size="11" font-weight="800" text-anchor="middle">SCALES TO</text>
+        <text x="142" y="192" fill="#9b2c2c" font-size="11" font-weight="800" text-anchor="middle">one conversation</text>
+      </g>
+      <g>
+        <rect x="292" y="40" width="256" height="176" rx="13" fill="#fff" stroke="#e8a63d" stroke-width="2"/>
+        <circle cx="330" cy="76" r="18" fill="#fdf3e1"/>
+        <text x="330" y="83" fill="#c9822a" font-size="16" font-weight="800" text-anchor="middle">02</text>
+        <text x="360" y="74" fill="#1b2430" font-size="15" font-weight="800">Project knowledge</text>
+        <text x="360" y="92" fill="#8a9bb0" font-size="11">UPLOAD ONCE</text>
+        <text x="314" y="126" fill="#5b6472" font-size="12.5">Read in every conversation.</text>
+        <text x="314" y="146" fill="#5b6472" font-size="12.5">Persistent and reviewable.</text>
+        <rect x="314" y="164" width="212" height="34" rx="8" fill="#fdf3e1"/>
+        <text x="420" y="178" fill="#a76c1c" font-size="11" font-weight="800" text-anchor="middle">SCALES TO</text>
+        <text x="420" y="192" fill="#a76c1c" font-size="11" font-weight="800" text-anchor="middle">every conversation</text>
+      </g>
+      <g>
+        <rect x="570" y="40" width="276" height="176" rx="13" fill="#fff" stroke="#2e9e52" stroke-width="3"/>
+        <circle cx="608" cy="76" r="18" fill="#eaf8ee"/>
+        <text x="608" y="83" fill="#2e9e52" font-size="16" font-weight="800" text-anchor="middle">03</text>
+        <text x="638" y="74" fill="#1b2430" font-size="15" font-weight="800">Live connector</text>
+        <text x="638" y="92" fill="#8a9bb0" font-size="11">MCP · PULLS ON ASK</text>
+        <text x="592" y="126" fill="#5b6472" font-size="12.5">Current at the moment of asking.</text>
+        <text x="592" y="146" fill="#5b6472" font-size="12.5">No upload step. Permission-aware.</text>
+        <rect x="592" y="164" width="232" height="34" rx="8" fill="#eaf8ee"/>
+        <text x="708" y="178" fill="#1d6b38" font-size="11" font-weight="800" text-anchor="middle">SCALES TO</text>
+        <text x="708" y="192" fill="#1d6b38" font-size="11" font-weight="800" text-anchor="middle">everything, always fresh</text>
+      </g>
+      <text x="430" y="24" fill="#0c2d5e" font-size="12.5" font-weight="800" text-anchor="middle">
+        EFFORT PER USE ↓ decreasing   ·   FRESHNESS ↑ increasing</text>
+      <text x="430" y="238" fill="#5b6472" font-size="12" text-anchor="middle" font-style="italic">
+        Today you build layer 2, and wire exactly one of layer 3.</text>
+    </svg>
+  </div>
+
+  <div class="card theory">
+    <div class="kicker">Theory 02</div>
+    <h3>Four Properties of a Base That Actually Works</h3>
+    <p style="color:var(--muted);font-size:14.5px;margin:0">Dumping files into a folder is not a knowledge layer.
+       Four properties separate a useful base from an expensive pile.</p>
+
+    <svg class="fig" viewBox="0 0 860 200" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Structured, opinionated, fresh, scoped">
+      <g>
+        <rect x="10" y="24" width="200" height="150" rx="12" fill="#eaf2fb" stroke="#2d6cad" stroke-width="2"/>
+        <text x="110" y="54" fill="#2d6cad" font-size="13.5" font-weight="800" text-anchor="middle">STRUCTURED</text>
+        <text x="110" y="86" fill="#1b2430" font-size="12" text-anchor="middle">Headed sections,</text>
+        <text x="110" y="104" fill="#1b2430" font-size="12" text-anchor="middle">not a wall of prose.</text>
+        <text x="110" y="134" fill="#5b6472" font-size="11" text-anchor="middle">Retrieval works on chunks —</text>
+        <text x="110" y="150" fill="#5b6472" font-size="11" text-anchor="middle">headings return the right one.</text>
+      </g>
+      <g>
+        <rect x="222" y="24" width="200" height="150" rx="12" fill="#eaf8ee" stroke="#2e9e52" stroke-width="2"/>
+        <text x="322" y="54" fill="#2e9e52" font-size="13.5" font-weight="800" text-anchor="middle">OPINIONATED</text>
+        <text x="322" y="86" fill="#1b2430" font-size="12" text-anchor="middle">States what good is</text>
+        <text x="322" y="104" fill="#1b2430" font-size="12" text-anchor="middle">and what to avoid.</text>
+        <text x="322" y="134" fill="#5b6472" font-size="11" text-anchor="middle">Neutral reference produces</text>
+        <text x="322" y="150" fill="#5b6472" font-size="11" text-anchor="middle">neutral output.</text>
+      </g>
+      <g>
+        <rect x="434" y="24" width="200" height="150" rx="12" fill="#fdf3e1" stroke="#e8a63d" stroke-width="2"/>
+        <text x="534" y="54" fill="#c9822a" font-size="13.5" font-weight="800" text-anchor="middle">FRESH</text>
+        <text x="534" y="86" fill="#1b2430" font-size="12" text-anchor="middle">Every section carries a</text>
+        <text x="534" y="104" fill="#1b2430" font-size="12" text-anchor="middle">last-reviewed date.</text>
+        <text x="534" y="134" fill="#5b6472" font-size="11" text-anchor="middle">A confidently stale answer</text>
+        <text x="534" y="150" fill="#5b6472" font-size="11" text-anchor="middle">is worse than no answer.</text>
+      </g>
+      <g>
+        <rect x="646" y="24" width="204" height="150" rx="12" fill="#f0ebfa" stroke="#7c5cbf" stroke-width="2"/>
+        <text x="748" y="54" fill="#7c5cbf" font-size="13.5" font-weight="800" text-anchor="middle">SCOPED</text>
+        <text x="748" y="86" fill="#1b2430" font-size="12" text-anchor="middle">Only what this</text>
+        <text x="748" y="104" fill="#1b2430" font-size="12" text-anchor="middle">project needs.</text>
+        <text x="748" y="134" fill="#5b6472" font-size="11" text-anchor="middle">Irrelevant material</text>
+        <text x="748" y="150" fill="#5b6472" font-size="11" text-anchor="middle">dilutes retrieval.</text>
+      </g>
+    </svg>
+
+    <div class="work">
+      <label>⚡ Quick check — which property is your Session 2 prompt weakest on, and why?</label>
+      <textarea data-k="t2" placeholder="e.g. Opinionated — my prompt lists facts about the brand but never says what a bad draft looks like..."></textarea>
+      <div class="hint">Saved in your browser as you type.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STEP 1 ===== -->
+<section id="s1">
+  <div class="shead"><div class="stepnum">1</div><h2>Draft the base document<span class="timebox">22 MIN</span></h2></div>
+  <p class="ssub">Goal: six headed sections, with real content in at least four.</p>
+
+  <div class="card doit">
+    <div class="kicker g">Do this now</div>
+    <ol class="steps">
+      <li>Create a new document titled for your role's intelligence base.</li>
+      <li>Paste your role's section headings from the block below.</li>
+      <li>Fill <b>four sections minimum</b> with real material. Perfect is not required — real is.</li>
+      <li>Put a last-reviewed date at the top, and on any section that ages quickly.</li>
+    </ol>
+
+    <!-- HR -->
+    <div class="rolebox on" data-role="hr">
+      <span class="rolechip">◈ HR Scouting Exec — your template</span>
+      <div class="codewrap">
+        <button class="copybtn" data-copy="tpl-hr">Copy</button>
+        <div class="code" id="tpl-hr"><span class="h"># TALENT INTELLIGENCE BASE</span> — last reviewed [DATE]
+
+<span class="h">## 1. ROLE SCORECARDS</span>
+Per open role: must-have requirements, nice-to-haves, and the specific evidence
+that proves each one. <span class="c">Not "strong communicator" — "has written external-facing
+technical documentation, link required".</span>
+
+<span class="h">## 2. WHAT GOOD LOOKED LIKE</span>
+Two profiles of people who succeeded here and what predicted it.
+Two who didn't work out, and what we missed at screening.
+
+<span class="h">## 3. CALIBRATION LANGUAGE</span>
+What Strong / Possible / No mean at our company specifically,
+with a real (anonymised) example of each.
+
+<span class="h">## 4. COMPENSATION BANDS</span>
+By level and location. Marked with the date they were set.
+
+<span class="h">## 5. COMPLIANCE BOUNDARIES</span>
+Attributes never to be assessed or inferred. Required record-keeping.
+What we can and cannot say in a rejection.
+
+<span class="h">## 6. SOURCING CHANNELS</span>
+Which channels produced hires that lasted, and which produced volume
+without quality.</div>
+      </div>
+      <div class="card warn" style="margin-top:14px;padding:14px 16px;box-shadow:none">
+        <div class="kicker o">Prioritise</div>
+        <div style="font-size:13.5px">Sections <b>1, 2 and 5</b> — scorecards, past outcomes, compliance.
+        <br><b>Section 2 is the one everyone skips and the one that carries the most signal.</b>
+        Failed hires are your best training data.</div>
+      </div>
+    </div>
+
+    <!-- CT -->
+    <div class="rolebox" data-role="ct">
+      <span class="rolechip">◉ Content &amp; Social — your template</span>
+      <div class="codewrap">
+        <button class="copybtn" data-copy="tpl-ct">Copy</button>
+        <div class="code" id="tpl-ct"><span class="h"># CONTENT INTELLIGENCE BASE</span> — last reviewed [DATE]
+
+<span class="h">## 1. VOICE</span>
+Three adjectives, then a paragraph written in the voice and a paragraph
+deliberately written wrong. <span class="c">The contrast teaches more than the adjectives.</span>
+
+<span class="h">## 2. PROVEN PATTERNS</span>
+Our five best-performing posts, verbatim, each with one line on why it worked.
+Our three worst, with why they failed.
+
+<span class="h">## 3. BANNED LANGUAGE</span>
+Exact phrases we never use. Superlatives we cannot substantiate.
+Claims that need legal review before publishing.
+
+<span class="h">## 4. AUDIENCE MAP</span>
+Who they are, what they already know (so we never explain it),
+what they are sceptical of, where they actually spend time.
+
+<span class="h">## 5. PLATFORM RULES</span>
+Per platform: format, length, what our audience responds to there
+specifically, posting cadence.
+
+<span class="h">## 6. COMPETITOR POSITIONS</span>
+What each competitor claims, and the space that leaves us.</div>
+      </div>
+      <div class="card warn" style="margin-top:14px;padding:14px 16px;box-shadow:none">
+        <div class="kicker o">Prioritise</div>
+        <div style="font-size:13.5px">Sections <b>1, 2 and 3</b> — voice, proven patterns, banned language.
+        <br><b>Section 3 saves the most time in practice.</b> Preventing the unusable draft is cheaper
+        than editing it.</div>
+      </div>
+    </div>
+
+    <!-- PM -->
+    <div class="rolebox" data-role="pm">
+      <span class="rolechip">▣ Project Manager — your template</span>
+      <div class="codewrap">
+        <button class="copybtn" data-copy="tpl-pm">Copy</button>
+        <div class="code" id="tpl-pm"><span class="h"># DELIVERY INTELLIGENCE BASE</span> — last reviewed [DATE]
+
+<span class="h">## 1. PROGRAMME CHARTER</span>
+Scope, explicit out-of-scope, success measures, and the constraints
+that cannot move.
+
+<span class="h">## 2. STAKEHOLDER MAP</span>
+Who decides what, who only needs informing, what each one actually cares
+about, and how each prefers to receive information.
+
+<span class="h">## 3. RAG DEFINITIONS</span>
+What red, amber and green mean here in measurable terms — not vibes.
+Include the threshold that flips amber to red.
+
+<span class="h">## 4. RISK PATTERNS</span>
+The five risks that have materialised on past programmes here, their early
+warning signs, and what actually mitigated them.
+
+<span class="h">## 5. DEPENDENCY REGISTER</span>
+External parties, their typical response times, and their historical
+reliability.
+
+<span class="h">## 6. REPORTING CADENCE</span>
+Who gets what, when, and in what format. Include what previously got
+ignored and why.</div>
+      </div>
+      <div class="card warn" style="margin-top:14px;padding:14px 16px;box-shadow:none">
+        <div class="kicker o">Prioritise</div>
+        <div style="font-size:13.5px">Sections <b>3, 4 and 5</b> — RAG definitions, risk patterns, dependencies.
+        <br><b>Section 4 is the difference between reporting a problem and predicting it.</b>
+        Past programmes are your only real early-warning system.</div>
+      </div>
+    </div>
+
+    <div class="work">
+      <label>📝 Paste your two strongest sections here (so you have them if the doc is lost)</label>
+      <textarea data-k="s1a" style="min-height:130px" placeholder="## 2. WHAT GOOD LOOKED LIKE&#10;..."></textarea>
+    </div>
+    <div class="work">
+      <label>🎯 Which sections did you fill, and which did you leave for homework?</label>
+      <textarea data-k="s1b" placeholder="Filled: 1, 2, 3, 5. For homework: 4 and 6."></textarea>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 15px;background:var(--green-light);border-radius:9px;
+                font-size:13.5px;color:#1d6b38">
+      <b>✓ You know it worked when:</b> six headings exist, four have real content, and the document is dated.
+    </div>
+  </div>
+</section>
+
+<!-- ===== STEP 2 ===== -->
+<section id="s2">
+  <div class="shead"><div class="stepnum">2</div><h2>Attach it to the project<span class="timebox">5 MIN</span></h2></div>
+  <p class="ssub">Goal: make it standing knowledge, not a chat attachment.</p>
+
+  <div class="card doit">
+    <div class="kicker g">Do this now</div>
+    <ol class="steps">
+      <li>Upload the document to <b>project knowledge</b> — not into a message.</li>
+      <li>Add one line to your system instructions naming the document as authoritative.</li>
+      <li>That conflict-resolution line matters. Without it, general knowledge quietly wins.</li>
+    </ol>
+
+    <div class="codewrap">
+      <button class="copybtn" data-copy="auth">Copy</button>
+      <div class="code" id="auth">Treat <span class="h">[DOCUMENT NAME]</span> as the authoritative standard.
+When it conflicts with your general knowledge, follow the document.</div>
+    </div>
+
+    <div class="rolebox on" data-role="hr">
+      <span class="rolechip">◈ HR — also add this line</span>
+      <div class="codewrap"><button class="copybtn" data-copy="a-hr">Copy</button>
+      <div class="code" id="a-hr">Never assess against criteria absent from the scorecards section.</div></div>
+    </div>
+    <div class="rolebox" data-role="ct">
+      <span class="rolechip">◉ Content — also add this line</span>
+      <div class="codewrap"><button class="copybtn" data-copy="a-ct">Copy</button>
+      <div class="code" id="a-ct">Check every draft against the banned language section before returning it.</div></div>
+    </div>
+    <div class="rolebox" data-role="pm">
+      <span class="rolechip">▣ PM — also add this line</span>
+      <div class="codewrap"><button class="copybtn" data-copy="a-pm">Copy</button>
+      <div class="code" id="a-pm">Set RAG only using the thresholds in section 3.</div></div>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 15px;background:var(--green-light);border-radius:9px;
+                font-size:13.5px;color:#1d6b38">
+      <b>✓ You know it worked when:</b> the document is in project knowledge and your instructions
+      name it as authoritative.
+    </div>
+  </div>
+</section>
+
+<!-- ===== STEP 3 ===== -->
+<section id="s3">
+  <div class="shead"><div class="stepnum">3</div><h2>Connect one live source<span class="timebox">18 MIN</span></h2></div>
+  <p class="ssub">Goal: one MCP connector delivering current data. One — not three.</p>
+
+  <div class="card theory">
+    <div class="kicker">How MCP works</div>
+    <svg class="fig" viewBox="0 0 860 210" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="MCP flow from you to Claude to connector to your systems">
+      <rect x="14" y="76" width="104" height="60" rx="11" fill="#0c2d5e"/>
+      <text x="66" y="102" fill="#fff" font-size="13" font-weight="800" text-anchor="middle">YOU</text>
+      <text x="66" y="120" fill="#9db3d6" font-size="10.5" text-anchor="middle">ask a question</text>
+      <path d="M 124 106 L 158 106" stroke="#2d6cad" stroke-width="2.5"/>
+      <path d="M 165 106 l -9 -5 l 0 10 z" fill="#2d6cad"/>
+
+      <rect x="172" y="66" width="120" height="80" rx="12" fill="#D97757"/>
+      <path d="M206 124 L226 88 h11 l20 36 h-10 l-3 -6.5 h-15 l-3 6.5 z M222 111 h9 l-4.5 -10 z" fill="#fff"/>
+      <text x="232" y="140" fill="#fff" font-size="11.5" font-weight="800" text-anchor="middle">CLAUDE</text>
+
+      <path d="M 298 106 L 332 106" stroke="#2d6cad" stroke-width="2.5"/>
+      <path d="M 339 106 l -9 -5 l 0 10 z" fill="#2d6cad"/>
+
+      <rect x="346" y="56" width="118" height="100" rx="12" fill="#1b2430"/>
+      <text x="405" y="80" fill="#fff" font-size="12" font-weight="800" text-anchor="middle">MCP</text>
+      <circle cx="405" cy="110" r="11" fill="#fff"/>
+      <circle cx="382" cy="96" r="5" fill="#8A9BB0"/><circle cx="428" cy="96" r="5" fill="#8A9BB0"/>
+      <circle cx="382" cy="124" r="5" fill="#8A9BB0"/><circle cx="428" cy="124" r="5" fill="#8A9BB0"/>
+      <path d="M397 104 L387 99 M413 104 L423 99 M397 116 L387 121 M413 116 L423 121"
+            stroke="#fff" stroke-width="1.4" opacity=".8"/>
+      <rect x="358" y="134" width="94" height="18" rx="5" fill="#2e9e52"/>
+      <text x="405" y="147" fill="#fff" font-size="9.5" font-weight="800" text-anchor="middle">SCOPE CHECK</text>
+
+      <path d="M 470 92 L 512 62" stroke="#8a9bb0" stroke-width="2"/>
+      <path d="M 518 58 l -3 10 l 8 -5 z" fill="#8a9bb0"/>
+      <path d="M 470 106 L 512 106" stroke="#8a9bb0" stroke-width="2"/>
+      <path d="M 519 106 l -8 -5 l 0 10 z" fill="#8a9bb0"/>
+      <path d="M 470 120 L 512 150" stroke="#8a9bb0" stroke-width="2"/>
+      <path d="M 518 154 l -5 -9 l -3 10 z" fill="#8a9bb0"/>
+
+      <rect x="526" y="38" width="188" height="42" rx="9" fill="#fff" stroke="#dfe4ea" stroke-width="2"/>
+      <text x="544" y="56" fill="#1b2430" font-size="12" font-weight="800">Google Drive</text>
+      <text x="544" y="72" fill="#8a9bb0" font-size="10.5">live docs &amp; folders</text>
+      <rect x="526" y="86" width="188" height="42" rx="9" fill="#fff" stroke="#dfe4ea" stroke-width="2"/>
+      <text x="544" y="104" fill="#1b2430" font-size="12" font-weight="800">Slack</text>
+      <text x="544" y="120" fill="#8a9bb0" font-size="10.5">channels &amp; decisions</text>
+      <rect x="526" y="134" width="188" height="42" rx="9" fill="#fff" stroke="#dfe4ea" stroke-width="2"/>
+      <text x="544" y="152" fill="#1b2430" font-size="12" font-weight="800">Notion / ATS / Tracker</text>
+      <text x="544" y="168" fill="#8a9bb0" font-size="10.5">your system of record</text>
+
+      <path d="M 726 106 L 780 106" stroke="#2e9e52" stroke-width="2.5"/>
+      <path d="M 787 106 l -9 -5 l 0 10 z" fill="#2e9e52"/>
+      <rect x="792" y="82" width="60" height="48" rx="10" fill="#eaf8ee" stroke="#2e9e52" stroke-width="2"/>
+      <text x="822" y="103" fill="#1d6b38" font-size="11" font-weight="800" text-anchor="middle">FRESH</text>
+      <text x="822" y="119" fill="#1d6b38" font-size="11" font-weight="800" text-anchor="middle">DATA</text>
+
+      <text x="430" y="22" fill="#0c2d5e" font-size="12" font-weight="800" text-anchor="middle">
+        THE MODEL NEVER GETS YOUR PASSWORD — THE CONNECTOR ENFORCES WHAT YOU ALLOWED</text>
+      <text x="430" y="198" fill="#5b6472" font-size="11.5" text-anchor="middle" font-style="italic">
+        Permission scope is the cause of failed connections roughly nine times out of ten.</text>
+    </svg>
+  </div>
+
+  <div class="card doit">
+    <div class="kicker g">Do this now</div>
+    <ol class="steps">
+      <li>Choose <b>ONE</b> source you check most often. Only one today.</li>
+      <li>Open your connector settings and authorise it. Grant <b>read access only</b> for now.</li>
+      <li>Verify with a specific retrieval question — something you can independently check.</li>
+      <li>If it fails, check the <b>permission scope</b> first. That's the cause nine times out of ten.</li>
+    </ol>
+
+    <div class="codewrap">
+      <button class="copybtn" data-copy="verify">Copy</button>
+      <div class="code" id="verify"><span class="c">// Verification prompt — run this right after connecting</span>
+Using the connected source, list the <span class="h">[5 MOST RECENT ITEMS]</span> with their
+<span class="h">[KEY FIELD]</span> and <span class="h">[DATE]</span>. If you cannot access the source, say so
+explicitly rather than answering from memory.</div>
+    </div>
+
+    <div class="rolebox on" data-role="hr">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--purple-light);border-radius:9px;font-size:13.5px">
+        <b>◈ HR — connect this:</b> your ATS, or the Drive folder holding live requisitions.</div>
+    </div>
+    <div class="rolebox" data-role="ct">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--purple-light);border-radius:9px;font-size:13.5px">
+        <b>◉ Content — connect this:</b> your analytics source, or the database holding your content calendar.</div>
+    </div>
+    <div class="rolebox" data-role="pm">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--purple-light);border-radius:9px;font-size:13.5px">
+        <b>▣ PM — connect this:</b> your project tracker (Asana, Jira, Linear) or the Drive folder with live status docs.</div>
+    </div>
+
+    <div class="work">
+      <label>🔌 Which source did you connect, and what did the verification question return?</label>
+      <textarea data-k="s3a" placeholder="Connected: Google Drive /Requisitions (read-only). Returned the 5 most recent reqs with owner + date — I checked 2 against the folder and they matched."></textarea>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 15px;background:var(--green-light);border-radius:9px;
+                font-size:13.5px;color:#1d6b38">
+      <b>✓ You know it worked when:</b> it returned real current data you can verify — <b>and</b> it would
+      have told you if it couldn't reach the source.
+    </div>
+  </div>
+</section>
+
+<!-- ===== STEP 4 ===== -->
+<section id="s4">
+  <div class="shead"><div class="stepnum">4</div><h2>Prove the layer changed the answer<span class="timebox">15 MIN</span></h2></div>
+  <p class="ssub">Goal: the on/off comparison that makes the value undeniable.</p>
+
+  <div class="card doit">
+    <div class="kicker g">Do this now</div>
+    <ol class="steps">
+      <li>Take your Session 2 prompt card. Run it in a <b>plain chat</b> — no knowledge, no connector. Save that.</li>
+      <li>Run it <b>inside your project</b> with the base and connector live. Save that.</li>
+      <li>Mark every place the knowledge layer changed a <b>judgement</b> — not just added detail.</li>
+    </ol>
+
+    <div class="grid2" style="margin-top:16px">
+      <div class="work">
+        <label style="color:var(--red)">🔴 BEFORE — no knowledge layer</label>
+        <textarea data-k="s4before" style="min-height:150px" placeholder="Paste the plain-chat output here..."></textarea>
+      </div>
+      <div class="work">
+        <label style="color:var(--green)">🟢 AFTER — base + connector live</label>
+        <textarea data-k="s4after" style="min-height:150px" placeholder="Paste the in-project output here..."></textarea>
+      </div>
+    </div>
+
+    <div class="rolebox on" data-role="hr">
+      <div style="margin-top:6px;padding:12px 15px;background:var(--purple-light);border-radius:9px;font-size:13.5px">
+        <b>◈ HR — watch for:</b> whether calibration language matches <i>your</i> definitions, or reverts to
+        generic recruiting language.</div>
+    </div>
+    <div class="rolebox" data-role="ct">
+      <div style="margin-top:6px;padding:12px 15px;background:var(--purple-light);border-radius:9px;font-size:13.5px">
+        <b>◉ Content — watch for:</b> whether banned phrases appear. Their <i>absence</i> is the layer working.</div>
+    </div>
+    <div class="rolebox" data-role="pm">
+      <div style="margin-top:6px;padding:12px 15px;background:var(--purple-light);border-radius:9px;font-size:13.5px">
+        <b>▣ PM — watch for:</b> whether RAG uses your thresholds, or invented ones.</div>
+    </div>
+
+    <div class="work">
+      <label>⭐ The one conclusion that <u>changed</u> — not just got longer</label>
+      <textarea data-k="s4delta" placeholder="Before it called the candidate 'Strong'. After, it returned 'Possible' with NOT EVIDENCED against two must-haves — because my scorecard says a title alone never qualifies."></textarea>
+      <div class="hint">This sentence is your demo material. It's what you show your manager.</div>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 15px;background:var(--green-light);border-radius:9px;
+                font-size:13.5px;color:#1d6b38">
+      <b>✓ You know it worked when:</b> you can point at a conclusion that is <b>different</b> — not merely
+      more detailed.
+    </div>
+  </div>
+</section>
+
+<!-- ===== CHECKPOINT ===== -->
+<section id="check">
+  <div class="shead"><div class="stepnum" style="background:var(--green)">✓</div><h2>Before You Close the Laptop</h2></div>
+  <p class="ssub">Tick each one. Anything unticked goes to #ts-team-cohort tonight.</p>
+
+  <div class="card">
+    <div class="chk"><input type="checkbox" id="c1"><label for="c1">My base has six headings and four sections with real content.</label></div>
+    <div class="chk"><input type="checkbox" id="c2"><label for="c2">Every section that ages carries a review date.</label></div>
+    <div class="chk"><input type="checkbox" id="c3"><label for="c3">My instructions tell the model the document wins when it conflicts with general knowledge.</label></div>
+    <div class="chk"><input type="checkbox" id="c4"><label for="c4">One connector is live and returned data I independently verified.</label></div>
+    <div class="chk"><input type="checkbox" id="c5"><label for="c5">I can point to a judgement — not just a detail — that the layer changed.</label></div>
+  </div>
+</section>
+
+<!-- ===== TROUBLESHOOTING ===== -->
+<section id="fix">
+  <div class="shead"><div class="stepnum" style="background:var(--red)">!</div><h2>When It Doesn't Work</h2></div>
+  <p class="ssub">Every one of these has a cause you can name and a fix you can apply in under two minutes.</p>
+
+  <div class="card warn">
+    <table>
+      <tr><th style="width:26%">Symptom</th><th style="width:37%">Actual cause</th><th style="width:37%">The fix</th></tr>
+      <tr><td><b>It ignores the knowledge document</b></td>
+          <td>The instructions never say the document is authoritative, so general knowledge competes with it.</td>
+          <td>Add the explicit conflict-resolution line naming the document.</td></tr>
+      <tr><td><b>The connector returns nothing</b></td>
+          <td>Permission scope too narrow, or the resource isn't shared with the authorising account.</td>
+          <td>Check scope first, then sharing. Test with the single simplest possible retrieval.</td></tr>
+      <tr><td><b>Answers got longer but not better</b></td>
+          <td>The base is reference material with no opinions in it.</td>
+          <td>Add the "what good looks like" and "what we never do" sections. Standards change output; facts only pad it.</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== LEVEL UP ===== -->
+<section id="levelup">
+  <div class="shead"><div class="stepnum" style="background:var(--purple)">↑</div><h2>If You Finish Early</h2></div>
+  <p class="ssub">Test the freshness discipline — the failure mode nobody notices until it's embarrassing.</p>
+
+  <div class="card" style="border-left:4px solid var(--purple)">
+    <div class="rolebox on" data-role="hr">
+      <b>◈ Challenge:</b> put a deliberately outdated comp band in the base with an old date.
+      Ask a comp question. Does it flag the age, or quote it as current?
+    </div>
+    <div class="rolebox" data-role="ct">
+      <b>◉ Challenge:</b> add a competitor position that is six months stale.
+      Ask for positioning. Does it caveat the date?
+    </div>
+    <div class="rolebox" data-role="pm">
+      <b>▣ Challenge:</b> add a dependency whose reliability data is a year old.
+      Ask for a risk view. Does it note the data's age?
+    </div>
+    <div class="work">
+      <label>🧪 What happened?</label>
+      <textarea data-k="lvl" placeholder="It quoted the 2024 band as current with no caveat. Adding 'flag any section older than 6 months' to the instructions fixed it."></textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOMEWORK ===== -->
+<section id="hw">
+  <div class="shead"><div class="stepnum" style="background:var(--gold)">→</div><h2>Before Session 4</h2></div>
+  <p class="ssub">Small on purpose. The goal is repetition on real work.</p>
+
+  <div class="card" style="border-left:4px solid var(--gold)">
+    <div class="chk"><input type="checkbox" id="h1"><label for="h1">Fill the remaining two sections of your base.</label></div>
+    <div class="chk"><input type="checkbox" id="h2"><label for="h2">Add one connector — a second one, read-only.</label></div>
+    <div class="chk"><input type="checkbox" id="h3"><label for="h3">Note every time the model gets something wrong that a better base would have caught. <b>That list is your section 7.</b></label></div>
+
+    <div class="work">
+      <label>📓 Your running "section 7" log</label>
+      <textarea data-k="hwlog" style="min-height:100px" placeholder="Mon — said our notice period was 4 weeks, it's 8. Wed — used 'best-in-class' which is on our banned list but not yet in the base."></textarea>
+    </div>
+
+    <div style="margin-top:16px;padding:14px 16px;background:var(--blue-light);border-radius:9px;font-size:13.5px">
+      <b>Next up — Session 4:</b> Sub-Agents &amp; Pipelines. Splitting one big job into a chain of specialists,
+      each with one job and a contract between them.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="exportbar">
+  <span class="savenote">💾 Auto-saved in this browser</span>
+  <button class="btn-primary" id="exportBtn">⬇ Export my work</button>
+  <button class="btn-ghost" id="printBtn">🖨 Print / PDF</button>
+  <button class="btn-ghost" id="clearBtn">Clear</button>
+</div>
+
+<footer>
+  Session 3 Build Lab &nbsp;|&nbsp; Talent Scout AI Marketing-Operator Cohort &nbsp;|&nbsp;
+  Questions in <a href="#" onclick="return false;">#ts-team-cohort</a>
+</footer>
+
+<script>
+(function(){
+  var PREFIX = 'ts_s3lab_';
+
+  /* ---------- role switching ---------- */
+  var roleBtns = document.querySelectorAll('.rolebtn');
+  function setRole(r){
+    roleBtns.forEach(function(b){ b.classList.toggle('on', b.dataset.role === r); });
+    document.querySelectorAll('.rolebox').forEach(function(box){
+      box.classList.toggle('on', box.dataset.role === r);
+    });
+    try{ localStorage.setItem(PREFIX+'role', r); }catch(e){}
+  }
+  roleBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setRole(b.dataset.role); });
+  });
+  var savedRole = null;
+  try{ savedRole = localStorage.getItem(PREFIX+'role'); }catch(e){}
+  setRole(savedRole || 'hr');
+
+  /* ---------- textarea persistence ---------- */
+  var areas = document.querySelectorAll('textarea[data-k]');
+  areas.forEach(function(ta){
+    var key = PREFIX + 'txt_' + ta.dataset.k;
+    try{ var v = localStorage.getItem(key); if(v) ta.value = v; }catch(e){}
+    ta.addEventListener('input', function(){
+      try{ localStorage.setItem(key, ta.value); }catch(e){}
+      refresh();
+    });
+  });
+
+  /* ---------- checkbox persistence ---------- */
+  var boxes = document.querySelectorAll('.chk input[type=checkbox]');
+  boxes.forEach(function(cb){
+    var key = PREFIX + 'chk_' + cb.id;
+    try{ if(localStorage.getItem(key) === '1'){ cb.checked = true; cb.closest('.chk').classList.add('done'); } }catch(e){}
+    cb.addEventListener('change', function(){
+      cb.closest('.chk').classList.toggle('done', cb.checked);
+      try{ localStorage.setItem(key, cb.checked ? '1' : '0'); }catch(e){}
+      refresh();
+    });
+  });
+
+  /* ---------- progress ---------- */
+  function refresh(){
+    var totalBoxes = boxes.length;
+    var doneBoxes = 0;
+    boxes.forEach(function(cb){ if(cb.checked) doneBoxes++; });
+    var totalAreas = areas.length;
+    var doneAreas = 0;
+    areas.forEach(function(t){ if(t.value.trim().length > 12) doneAreas++; });
+    var total = totalBoxes + totalAreas;
+    var done = doneBoxes + doneAreas;
+    var pct = total ? Math.round(done / total * 100) : 0;
+    document.getElementById('pfill').style.width = pct + '%';
+    document.getElementById('ptext').textContent =
+      done + ' of ' + total + ' complete — ' + pct + '%';
+  }
+  refresh();
+
+  /* ---------- copy buttons ---------- */
+  document.querySelectorAll('.copybtn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el = document.getElementById(btn.dataset.copy);
+      if(!el) return;
+      var text = el.innerText;
+      var done = function(){
+        var old = btn.textContent;
+        btn.textContent = '✓ Copied';
+        setTimeout(function(){ btn.textContent = old; }, 1400);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done, function(){ fallback(text, done); });
+      } else { fallback(text, done); }
+    });
+  });
+  function fallback(text, cb){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); cb(); }catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- export ---------- */
+  var LABELS = {
+    t2:'Weakest property of my S2 prompt',
+    s1a:'My two strongest base sections',
+    s1b:'Sections filled vs left for homework',
+    s3a:'Connector + verification result',
+    s4before:'BEFORE — no knowledge layer',
+    s4after:'AFTER — base + connector live',
+    s4delta:'The conclusion that CHANGED',
+    lvl:'Level-up challenge result',
+    hwlog:'Running section-7 log'
+  };
+  document.getElementById('exportBtn').addEventListener('click', function(){
+    var roleName = {hr:'HR Scouting Exec', ct:'Content & Social', pm:'Project Manager'};
+    var r = document.querySelector('.rolebtn.on');
+    var lines = [];
+    lines.push('# SESSION 3 BUILD LAB — THE KNOWLEDGE LAYER');
+    lines.push('');
+    lines.push('Role: ' + (r ? roleName[r.dataset.role] : '—'));
+    lines.push('Exported: ' + new Date().toLocaleString());
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+    areas.forEach(function(ta){
+      var label = LABELS[ta.dataset.k] || ta.dataset.k;
+      lines.push('## ' + label);
+      lines.push('');
+      lines.push(ta.value.trim() ? ta.value.trim() : '_(not completed)_');
+      lines.push('');
+    });
+    lines.push('---');
+    lines.push('');
+    lines.push('## CHECKPOINT');
+    lines.push('');
+    boxes.forEach(function(cb){
+      var lbl = document.querySelector('label[for="' + cb.id + '"]');
+      lines.push('- [' + (cb.checked ? 'x' : ' ') + '] ' + (lbl ? lbl.innerText.trim() : cb.id));
+    });
+    lines.push('');
+    lines.push('_Talent Scout AI Marketing-Operator Cohort — Session 3_');
+
+    var blob = new Blob([lines.join('\n')], {type:'text/markdown;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'Session3-KnowledgeLayer-MyWork.md';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  });
+
+  document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
+
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    if(!confirm('Clear everything you typed on this page? This cannot be undone.')) return;
+    areas.forEach(function(ta){
+      ta.value = '';
+      try{ localStorage.removeItem(PREFIX + 'txt_' + ta.dataset.k); }catch(e){}
+    });
+    boxes.forEach(function(cb){
+      cb.checked = false;
+      cb.closest('.chk').classList.remove('done');
+      try{ localStorage.removeItem(PREFIX + 'chk_' + cb.id); }catch(e){}
+    });
+    refresh();
+  });
+})();
+</script>
+
+</body>
+</html>

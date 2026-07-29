@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cohort Resource Hub — Talent Scout AI Marketing-Operator Cohort</title>
+<style>
+  :root{
+    --navy:#0c2d5e; --navy-dark:#081d3f; --blue:#2d6cad; --blue-light:#eaf2fb;
+    --green:#2e9e52; --green-light:#eaf8ee; --orange:#e2622d; --orange-light:#fdeee7;
+    --gold:#e8a63d; --gold-light:#fdf3e1; --purple:#7c5cbf; --purple-light:#f0ebfa;
+    --red:#d64545; --red-light:#fdecec; --cyan:#1a9aa8; --cyan-light:#e6f6f8;
+    --ink:#1b2430; --muted:#5b6472; --line:#dfe4ea; --bg:#f4f6f9; --white:#fff;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.55;}
+  a{color:var(--blue);}
+
+  .hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-dark) 100%);color:#fff;
+    padding:38px 24px 30px;text-align:center;}
+  .hero .eyebrow{letter-spacing:2.5px;font-size:11.5px;color:#9db3d6;font-weight:700;
+    text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:clamp(27px,4.8vw,42px);margin:0 0 10px;font-weight:800;}
+  .hero p{max-width:620px;margin:0 auto;color:#cfdcf0;font-size:15px;}
+
+  .nav{position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--line);
+    display:flex;justify-content:center;gap:3px;padding:10px 12px;flex-wrap:wrap;
+    box-shadow:0 2px 10px rgba(10,30,60,.06);}
+  .nav button{border:none;background:transparent;color:var(--muted);font-weight:700;font-size:12.5px;
+    padding:8px 13px;border-radius:20px;cursor:pointer;transition:all .15s;}
+  .nav button:hover{background:var(--blue-light);color:var(--blue);}
+  .nav button.active{background:var(--navy);color:#fff;}
+
+  main{max-width:1120px;margin:0 auto;padding:30px 20px 70px;}
+  section{margin-bottom:50px;scroll-margin-top:70px;}
+  .shead h2{font-size:23px;margin:0 0 4px;}
+  .ssub{color:var(--muted);font-size:14px;font-style:italic;margin-bottom:20px;}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;
+    box-shadow:0 1px 3px rgba(10,30,60,.05);}
+
+  /* session cards */
+  .sessions{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;}
+  .scard{background:#fff;border:1px solid var(--line);border-radius:15px;overflow:hidden;
+    transition:all .2s;display:flex;flex-direction:column;}
+  .scard:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(10,30,60,.12);}
+  .scard .top{padding:16px 20px;color:#fff;}
+  .scard .num{font-size:11px;font-weight:800;letter-spacing:2px;opacity:.85;}
+  .scard .ttl{font-size:18px;font-weight:800;margin-top:3px;}
+  .scard .sub{font-size:12.5px;opacity:.9;margin-top:2px;}
+  .scard .body{padding:16px 20px;flex:1;display:flex;flex-direction:column;}
+  .scard .date{font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:1px;
+    text-transform:uppercase;margin-bottom:10px;}
+  .scard .desc{font-size:13.5px;color:var(--muted);margin-bottom:14px;flex:1;}
+  .links{display:flex;flex-direction:column;gap:6px;}
+  .links a{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;
+    text-decoration:none;padding:8px 11px;border-radius:8px;background:var(--bg);
+    color:var(--navy);transition:all .15s;}
+  .links a:hover{background:var(--blue-light);color:var(--blue);}
+  .links a.soon{opacity:.5;pointer-events:none;}
+  .links .ic{font-size:14px;}
+  .st{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:1px;padding:2px 7px;
+    border-radius:12px;margin-left:auto;text-transform:uppercase;}
+  .st.live{background:var(--green-light);color:var(--green);}
+  .st.soon{background:#eef1f5;color:var(--muted);}
+
+  .c-s3 .top{background:linear-gradient(135deg,var(--cyan),#13757f);}
+  .c-s4 .top{background:linear-gradient(135deg,var(--purple),#5e429b);}
+  .c-s5 .top{background:linear-gradient(135deg,var(--gold),#c9822a);}
+  .c-s6 .top{background:linear-gradient(135deg,var(--orange),#b34a1d);}
+  .c-s7 .top{background:linear-gradient(135deg,var(--red),#a83232);}
+  .c-s8 .top{background:linear-gradient(135deg,var(--navy),var(--navy-dark));}
+
+  /* run of show */
+  .ros{display:flex;flex-direction:column;gap:8px;}
+  .rosrow{display:grid;grid-template-columns:88px 1fr;gap:14px;align-items:stretch;}
+  .rostime{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;
+    color:var(--acc,var(--blue));background:var(--bg);border:1px solid var(--line);border-radius:9px;}
+  .rosbody{background:#fff;border:1px solid var(--line);border-left:3px solid var(--acc,var(--blue));
+    border-radius:9px;padding:11px 15px;}
+  .rosbody .t{font-size:14.5px;font-weight:700;}
+  .rosbody .d{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .newtag{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:1px;
+    background:var(--green);color:#fff;padding:1px 7px;border-radius:11px;margin-left:7px;
+    vertical-align:middle;}
+
+  /* prompt library */
+  .plib{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px;}
+  .prompt{background:#fff;border:1px solid var(--line);border-radius:13px;padding:17px;}
+  .prompt .cat{font-size:10px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;
+    color:var(--purple);margin-bottom:5px;}
+  .prompt h4{margin:0 0 6px;font-size:15px;}
+  .prompt .when{font-size:12px;color:var(--muted);margin-bottom:10px;}
+  .code{background:#0f1b2d;color:#dbe7f5;border-radius:9px;padding:13px 15px;
+    font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11.5px;line-height:1.7;
+    white-space:pre-wrap;position:relative;overflow-x:auto;}
+  .code .h{color:#b79dfb;font-weight:700;}
+  .code .g{color:#66d9a0;font-weight:700;}
+  .code .c{color:#7d8fa8;font-style:italic;}
+  .copybtn{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);border:none;
+    color:#dbe7f5;font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;}
+  .copybtn:hover{background:rgba(255,255,255,.25);}
+  .cw{position:relative;}
+
+  /* faq */
+  .faq{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+  .faqq{width:100%;text-align:left;background:none;border:none;padding:15px 18px;font-weight:700;
+    font-size:14.5px;color:var(--navy);cursor:pointer;display:flex;justify-content:space-between;
+    align-items:center;gap:12px;}
+  .faqq:hover{background:var(--blue-light);}
+  .faqq .arw{transition:transform .2s;color:var(--muted);font-size:13px;flex-shrink:0;}
+  .faqq.open .arw{transform:rotate(180deg);}
+  .faqa{max-height:0;overflow:hidden;transition:max-height .25s ease;padding:0 18px;font-size:14px;}
+  .faqa .inner{padding:0 0 16px;color:var(--ink);}
+  .faqa b{color:var(--navy);}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media (max-width:800px){.grid2{grid-template-columns:1fr;}}
+
+  .vidlist{list-style:none;padding:0;margin:0;}
+  .vidlist li{padding:11px 0;border-bottom:1px dashed var(--line);font-size:13.5px;}
+  .vidlist li:last-child{border-bottom:none;}
+  .vidlist .lvl{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:1px;
+    padding:2px 7px;border-radius:11px;margin-right:8px;text-transform:uppercase;}
+  .lvl.start{background:var(--green-light);color:var(--green);}
+  .lvl.mid{background:var(--gold-light);color:#a76c1c;}
+  .vidlist .why{display:block;color:var(--muted);font-size:12.5px;margin-top:3px;}
+
+  .callout{border-left:4px solid var(--gold);background:var(--gold-light);border-radius:8px;
+    padding:14px 17px;font-size:13.5px;color:#7a5416;margin-top:16px;}
+  .callout.good{border-left-color:var(--green);background:var(--green-light);color:#1d6b38;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{text-align:left;background:var(--navy);color:#fff;padding:10px 12px;font-size:11px;
+    letter-spacing:1.2px;text-transform:uppercase;}
+  th:first-child{border-radius:8px 0 0 0;} th:last-child{border-radius:0 8px 0 0;}
+  td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+  tr:nth-child(even) td{background:#fafbfd;}
+
+  footer{text-align:center;background:var(--navy-dark);color:#b9c9e4;font-size:12.5px;padding:22px;}
+  footer a{color:#fff;}
+  ::selection{background:var(--gold);color:#1b2430;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">Talent Scout · AI Marketing-Operator Cohort</div>
+  <h1>Cohort Resource Hub</h1>
+  <p>Everything for every session — deck, build lab, resources and homework — in one place,
+     published ahead of time. Bookmark this page.</p>
+</div>
+
+<nav class="nav" id="nav">
+  <button data-target="sessions" class="active">All Sessions</button>
+  <button data-target="ros">Session Format</button>
+  <button data-target="quickstart">Quick Start</button>
+  <button data-target="prompts">Prompt Library</button>
+  <button data-target="videos">Video Guides</button>
+  <button data-target="faq">FAQ</button>
+</nav>
+
+<main>
+
+<!-- ===== SESSIONS ===== -->
+<section id="sessions">
+  <div class="shead"><h2>📚 All Sessions</h2></div>
+  <p class="ssub">Everything is published before the session, not after. Nothing is held back.</p>
+
+  <div class="sessions">
+    <div class="scard c-s3">
+      <div class="top"><div class="num">MODULE 03 · KNOWLEDGE</div>
+        <div class="ttl">The Knowledge Layer</div>
+        <div class="sub">Stop Re-Explaining Your Job</div></div>
+      <div class="body">
+        <div class="date">Wed Jul 29 · 2 hrs</div>
+        <div class="desc">Build a Brand/Role Intelligence base, attach it to your project, and wire one
+          live MCP connector. Then prove the layer changed a judgement.</div>
+        <div class="links">
+          <a href="visuals.html#knowledge"><span class="ic">📊</span> Theory visuals<span class="st live">Live</span></a>
+          <a href="session3-lab.html"><span class="ic">🔨</span> Build Lab workbook<span class="st live">Live</span></a>
+          <a href="session3-4.html"><span class="ic">📋</span> Prep guide<span class="st live">Live</span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scard c-s4">
+      <div class="top"><div class="num">MODULE 04 · SPECIALISATION</div>
+        <div class="ttl">Sub-Agents &amp; Pipelines</div>
+        <div class="sub">One Agent Per Job. Handoffs In Between.</div></div>
+      <div class="body">
+        <div class="date">Thu Jul 30 · 2 hrs</div>
+        <div class="desc">Split one big job into three specialists with contracts between them.
+          Run it end to end, then break it on purpose to find the weakest link.</div>
+        <div class="links">
+          <a href="visuals.html#pipelines"><span class="ic">📊</span> Theory visuals<span class="st live">Live</span></a>
+          <a href="session4-lab.html"><span class="ic">🔨</span> Build Lab workbook<span class="st live">Live</span></a>
+          <a href="session3-4.html"><span class="ic">📋</span> Prep guide<span class="st live">Live</span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scard c-s5">
+      <div class="top"><div class="num">MODULE 05 · AUTOMATION</div>
+        <div class="ttl">Triggers</div>
+        <div class="sub">Who Presses Run?</div></div>
+      <div class="body">
+        <div class="date">Week 3 · 2 hrs</div>
+        <div class="desc">Hand over the start button. One schedule-based automation, one event-based
+          trigger, and a written exception rule for when it must stop and ask.</div>
+        <div class="links">
+          <a href="visuals.html#triggers"><span class="ic">📊</span> Theory visuals<span class="st live">Live</span></a>
+          <a href="#" class="soon"><span class="ic">🔨</span> Build Lab workbook<span class="st soon">Wk 3</span></a>
+          <a href="#" class="soon"><span class="ic">📋</span> Prep guide<span class="st soon">Wk 3</span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scard c-s6">
+      <div class="top"><div class="num">MODULE 06 · CONNECTIVITY</div>
+        <div class="ttl">Stack Health</div>
+        <div class="sub">Narrow Scope Is Cheaper and Safer</div></div>
+      <div class="body">
+        <div class="date">Week 3 · 2 hrs</div>
+        <div class="desc">Audit every connector with a keep/cut/narrow decision. Build one end-to-end
+          flow crossing three systems. Set a quarterly re-audit reminder.</div>
+        <div class="links">
+          <a href="visuals.html#health"><span class="ic">📊</span> Theory visuals<span class="st live">Live</span></a>
+          <a href="#" class="soon"><span class="ic">🔨</span> Build Lab workbook<span class="st soon">Wk 3</span></a>
+          <a href="#" class="soon"><span class="ic">🗣</span> Open blockers clinic<span class="st soon">Wk 3</span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scard c-s7">
+      <div class="top"><div class="num">MODULE 07 · GOVERNANCE</div>
+        <div class="ttl">Guardrails</div>
+        <div class="sub">Speed Without Control Destroys Trust</div></div>
+      <div class="body">
+        <div class="date">Week 4 · 2 hrs</div>
+        <div class="desc">Guardrails at the instruction, context and output layers. Build a human review
+          gate — then red-team a colleague's system and fix what they find in yours.</div>
+        <div class="links">
+          <a href="visuals.html#guardrails"><span class="ic">📊</span> Theory visuals<span class="st live">Live</span></a>
+          <a href="#" class="soon"><span class="ic">🔨</span> Build Lab workbook<span class="st soon">Wk 4</span></a>
+          <a href="#" class="soon"><span class="ic">📋</span> Prep guide<span class="st soon">Wk 4</span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scard c-s8">
+      <div class="top"><div class="num">MODULE 08 · CAPSTONE</div>
+        <div class="ttl">Deploy</div>
+        <div class="sub">Six Layers. One Demo. Proof You Can Show.</div></div>
+      <div class="body">
+        <div class="date">Week 4 · 2 hrs</div>
+        <div class="desc">The full six-layer stack running end to end, a one-page system card documenting
+          it, and a five-minute live demo you can show a hiring manager or your leadership.</div>
+        <div class="links">
+          <a href="visuals.html#stack"><span class="ic">📊</span> Theory visuals<span class="st live">Live</span></a>
+          <a href="#" class="soon"><span class="ic">🔨</span> Build Lab workbook<span class="st soon">Wk 4</span></a>
+          <a href="#" class="soon"><span class="ic">🎬</span> Demo template<span class="st soon">Wk 4</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout good">
+    <b>📊 The Visual Theory Library</b> covers every concept across all eight sessions in one page —
+    the six-layer stack, the tool landscape with logos, RCTFX anatomy, MCP architecture, pipeline patterns,
+    trigger types and guardrail layers. <a href="visuals.html"><b>Open it here →</b></a>
+  </div>
+</section>
+
+<!-- ===== RUN OF SHOW ===== -->
+<section id="ros">
+  <div class="shead"><h2>⏱ How Every Session Now Runs</h2></div>
+  <p class="ssub">Same shape every week, so nobody has to guess what's coming.</p>
+
+  <div class="card">
+    <div class="ros">
+      <div class="rosrow" style="--acc:var(--green)">
+        <div class="rostime">0:00–0:10</div>
+        <div class="rosbody"><div class="t">Q&amp;A + last week's recap <span class="newtag">New</span></div>
+          <div class="d">Open floor. Bring blockers from the week. Quick review of what we built last session
+            before anything new starts.</div></div>
+      </div>
+      <div class="rosrow" style="--acc:var(--blue)">
+        <div class="rostime">0:10–0:25</div>
+        <div class="rosbody"><div class="t">Theory — with visuals</div>
+          <div class="d">The concept, drawn. Every diagram is already published in the Visual Theory Library
+            so you can re-read it later.</div></div>
+      </div>
+      <div class="rosrow" style="--acc:var(--gold)">
+        <div class="rostime">0:25–0:40</div>
+        <div class="rosbody"><div class="t">Live demo</div>
+          <div class="d">Felipe builds it on screen, narrating every decision. Follow along or just watch —
+            the workbook has every step written down.</div></div>
+      </div>
+      <div class="rosrow" style="--acc:var(--muted)">
+        <div class="rostime">0:40–0:45</div>
+        <div class="rosbody"><div class="t">☕ Break — 5 minutes <span class="newtag">New</span></div>
+          <div class="d">Coffee, water, stretch, chat. Cameras off. Come back at :45.</div></div>
+      </div>
+      <div class="rosrow" style="--acc:var(--green)">
+        <div class="rostime">0:45–1:30</div>
+        <div class="rosbody"><div class="t">Build time — you, working</div>
+          <div class="d">The bulk of the session. Follow the Build Lab workbook at your own pace.
+            Felipe circulates. Extra time built in for setup and role adaptation.</div></div>
+      </div>
+      <div class="rosrow" style="--acc:var(--purple)">
+        <div class="rostime">1:30–1:50</div>
+        <div class="rosbody"><div class="t">Share + live review</div>
+          <div class="d">Two volunteers show their build. Predict → run → diagnose → one targeted fix → rerun.</div></div>
+      </div>
+      <div class="rosrow" style="--acc:var(--navy)">
+        <div class="rostime">1:50–2:00</div>
+        <div class="rosbody"><div class="t">Close + homework</div>
+          <div class="d">What shipped today, what to do before next week, what's coming.</div></div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <b>After every session</b> you get a summary + FAQ doc in <b>#ts-team-cohort</b> within 24 hours,
+      capturing what was asked live and what got answered. Questions you'd rather ask in advance go to Maria,
+      who passes them to Felipe before the session so they get proper airtime.
+    </div>
+  </div>
+</section>
+
+<!-- ===== QUICK START ===== -->
+<section id="quickstart">
+  <div class="shead"><h2>⚡ Quick Start Guides</h2></div>
+  <p class="ssub">The two setup jobs people get stuck on, written as plainly as possible.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0;display:flex;align-items:center;gap:9px">
+        <svg width="26" height="26" viewBox="0 0 40 40" aria-label="Obsidian">
+          <rect width="40" height="40" rx="9" fill="#4A3B8C"/>
+          <path d="M22.5 7 L30 15.5 L26.5 31 L15 33 L9.5 24 L13.5 10.5 z" fill="#A88BFA"/>
+          <path d="M22.5 7 L26.5 31 L15 33 z" fill="#C7B4FD"/>
+          <path d="M13.5 10.5 L22.5 7 L15 33 L9.5 24 z" fill="#8B6FE8"/>
+        </svg>
+        Obsidian in 6 steps</h3>
+      <ol style="font-size:13.5px;padding-left:20px;margin:10px 0 0">
+        <li style="margin-bottom:7px">Download from <b>obsidian.md</b>. It's free. No account, no card.</li>
+        <li style="margin-bottom:7px">Open it → <b>Create new vault</b>.</li>
+        <li style="margin-bottom:7px">Name it <b>AI-Operator-Stack</b>. Save it somewhere you'll find it
+          (Documents is fine).</li>
+        <li style="margin-bottom:7px">In the left sidebar, click the <b>new folder</b> icon and create these seven:
+          <div style="background:var(--bg);border-radius:7px;padding:9px 11px;margin-top:6px;
+                      font-family:ui-monospace,Menlo,monospace;font-size:11.5px;line-height:1.9">
+            /Templates<br>/Agent-Briefs<br>/Knowledge<br>/Pipelines<br>/Sessions<br>/Logs<br>/Inbox</div>
+        </li>
+        <li style="margin-bottom:7px">Make one note in <b>/Sessions</b> called
+          <b>Week-1-Architecture</b>. Anything in it. Just prove it saves.</li>
+        <li>That's it. Your vault is plain markdown files on your own disk —
+          nothing is locked in, and it works offline.</li>
+      </ol>
+      <div class="callout good" style="margin-top:14px">
+        <b>Why Obsidian and not Notion/Docs?</b> Your notes are plain text files you own.
+        No subscription, no export problem, and Claude can read the folder directly.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;display:flex;align-items:center;gap:9px">
+        <svg width="26" height="26" viewBox="0 0 40 40" aria-label="Claude">
+          <rect width="40" height="40" rx="9" fill="#D97757"/>
+          <path d="M12.2 27.5 L17.9 12.5 h4.3 l5.7 15 h-3.9 l-1.2-3.4 h-5.6 l-1.2 3.4 z
+                   M18.2 21.1 h3.7 L20.05 15.7 z" fill="#fff"/>
+        </svg>
+        Your first Claude workspace</h3>
+      <ol style="font-size:13.5px;padding-left:20px;margin:10px 0 0">
+        <li style="margin-bottom:7px">Open Claude → <b>Projects</b> → <b>New project</b>.</li>
+        <li style="margin-bottom:7px">Name it for a <b>job</b>, not a topic.
+          Good: "Candidate Screening". Bad: "AI stuff".</li>
+        <li style="margin-bottom:7px">Open <b>Set project instructions</b> and paste the starter below.</li>
+        <li style="margin-bottom:7px">Replace every <b>[BRACKET]</b> with something real about your work.
+          No placeholders.</li>
+        <li style="margin-bottom:7px">Send one test message. If the reply sounds like it could be for
+          any company, your context isn't specific enough yet.</li>
+        <li>Repeat for your two other most frequent jobs. Three workspaces total.</li>
+      </ol>
+      <div class="cw" style="margin-top:12px">
+        <button class="copybtn" data-copy="ws">Copy</button>
+        <div class="code" id="ws"><span class="h">ROLE</span>
+You are a [SPECIFIC EXPERT] supporting [YOUR NAME] at [COMPANY].
+
+<span class="h">CONTEXT</span>
+We are [WHAT THE COMPANY DOES] serving [WHO].
+My role is [YOUR ROLE]. I produce [MAIN OUTPUT] for [WHO READS IT].
+Constraints that never change: [BUDGET / LEGAL / TIME].
+What went wrong before: [ONE REAL EXAMPLE].
+
+<span class="h">DEFAULT TASK</span>
+Unless told otherwise, help me [THE ONE THING THIS PROJECT IS FOR].
+
+<span class="h">FORMAT</span>
+Lead with the answer. Numbered sections. Max [LENGTH].
+
+<span class="g">CONSTRAINTS</span>
+Never [PROHIBITION].
+If information is missing, write NEEDS INPUT naming the gap —
+do not infer it.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROMPT LIBRARY ===== -->
+<section id="prompts">
+  <div class="shead"><h2>📎 Prompt Library</h2></div>
+  <p class="ssub">Copy, paste, replace the brackets. Grouped by what you're trying to do.</p>
+
+  <div class="plib">
+    <div class="prompt">
+      <div class="cat">Foundation · Session 2</div>
+      <h4>The RCTFX skeleton</h4>
+      <div class="when">Use when: any recurring task with consistent output.</div>
+      <div class="cw"><button class="copybtn" data-copy="p1">Copy</button>
+      <div class="code" id="p1"><span class="h">ROLE:</span> Act as a [SPECIFIC EXPERT] who has done [THIS EXACT TASK] before.
+
+<span class="h">CONTEXT:</span> [WHO THIS IS FOR AND HOW THEY READ IT]. [WHAT WENT WRONG
+LAST TIME]. [THE CONSTRAINT THEY CANNOT CHANGE]. [WHAT THEY ALREADY KNOW].
+
+<span class="h">TASK:</span> [ONE VERB] the [ONE DELIVERABLE] from the material below.
+
+<span class="h">FORMAT:</span> (1) [ELEMENT]. (2) [ELEMENT]. (3) [ELEMENT]. Max [LENGTH].
+
+<span class="h">EXAMPLES &amp; CONSTRAINTS:</span> Good looks like — "[REAL FRAGMENT]".
+Bad looks like — "[REAL BAD FRAGMENT]". Never [PROHIBITION].
+If [GAP CONDITION], write [FLAG WORD] instead of inferring.
+
+<span class="g">MATERIAL:</span> [PASTE]</div></div>
+    </div>
+
+    <div class="prompt">
+      <div class="cat">Knowledge · Session 3</div>
+      <h4>Make a document authoritative</h4>
+      <div class="when">Use when: the model ignores your knowledge base.</div>
+      <div class="cw"><button class="copybtn" data-copy="p2">Copy</button>
+      <div class="code" id="p2">Treat <span class="h">[DOCUMENT NAME]</span> as the authoritative standard.
+When it conflicts with your general knowledge, follow the document.
+
+If a section of that document is older than [6 MONTHS], flag its age
+in your answer rather than presenting it as current.</div></div>
+    </div>
+
+    <div class="prompt">
+      <div class="cat">Knowledge · Session 3</div>
+      <h4>Verify a live connector</h4>
+      <div class="when">Use when: you've just authorised a connector and need to prove it works.</div>
+      <div class="cw"><button class="copybtn" data-copy="p3">Copy</button>
+      <div class="code" id="p3">Using the connected source, list the <span class="h">[5 MOST RECENT ITEMS]</span> with
+their <span class="h">[KEY FIELD]</span> and <span class="h">[DATE]</span>.
+
+If you cannot access the source, say so explicitly rather than
+answering from memory.</div></div>
+    </div>
+
+    <div class="prompt">
+      <div class="cat">Pipelines · Session 4</div>
+      <h4>Gatherer stage (stage 1)</h4>
+      <div class="when">Use when: building the first stage of any pipeline.</div>
+      <div class="cw"><button class="copybtn" data-copy="p4">Copy</button>
+      <div class="code" id="p4"><span class="h">ROLE:</span> Act as a [DOMAIN] evidence extractor.
+
+<span class="h">TASK:</span> Extract every factual claim from the input below.
+
+<span class="g">CONSTRAINT:</span> Make no judgement and draw no conclusion. Extraction only.
+No adjectives, no assessment, no ranking.
+
+<span class="h">OUTPUT CONTRACT:</span> a markdown table. First row is the column names.
+Columns: claim | source line | confidence (stated / implied / absent).
+
+<span class="g">STOP CONDITION:</span> if the input is unreadable or yields fewer than
+[N] extractable claims, return INSUFFICIENT INPUT and stop.
+
+<span class="g">INPUT:</span> [PASTE]</div></div>
+    </div>
+
+    <div class="prompt">
+      <div class="cat">Pipelines · Session 4</div>
+      <h4>Judge stage (stage 2)</h4>
+      <div class="when">Use when: the stage that applies your standard to gathered evidence.</div>
+      <div class="cw"><button class="copybtn" data-copy="p5">Copy</button>
+      <div class="code" id="p5"><span class="h">INPUT REQUIREMENT:</span> This agent accepts ONLY a table with the columns
+[COL1] | [COL2] | [COL3]. If the input is not in that structure,
+return MALFORMED INPUT and stop. Do not guess the structure.
+
+<span class="h">ROLE:</span> Act as a [DOMAIN] assessor. Judge only — gather nothing new.
+
+<span class="h">TASK:</span> Map each [REQUIREMENT] to the evidence supporting it.
+
+<span class="g">MISSING FIELD RULE:</span> if a field is blank or marked 'implied',
+treat it as unevidenced. Never infer it.
+
+<span class="h">OUTPUT CONTRACT:</span> requirement | evidence reference | verdict.
+
+<span class="g">STOP CONDITION:</span> if more than half of [MUST-HAVES] are unevidenced,
+return NO with reasons and stop.</div></div>
+    </div>
+
+    <div class="prompt">
+      <div class="cat">Pipelines · Session 4</div>
+      <h4>Communicator stage (stage 3)</h4>
+      <div class="when">Use when: the final stage that turns judgement into something readable.</div>
+      <div class="cw"><button class="copybtn" data-copy="p6">Copy</button>
+      <div class="code" id="p6"><span class="h">ROLE:</span> Act as a [DOMAIN] communicator writing for [AUDIENCE].
+
+<span class="h">TASK:</span> Turn the assessment below into a [90-SECOND READ].
+
+<span class="g">HARD CONSTRAINTS:</span>
+- May not introduce any claim not present in the input.
+- May not change any verdict or rating set upstream.
+- Maximum [N] words.
+
+<span class="h">OUTPUT CONTRACT:</span> (1) [VERDICT]. (2) The two decisive factors.
+(3) Three questions probing the weakest items. (4) Open risks.
+
+<span class="g">INPUT:</span> [PASTE STAGE 2 OUTPUT]</div></div>
+    </div>
+
+    <div class="prompt">
+      <div class="cat">Debugging · Any session</div>
+      <h4>Diagnose your own prompt</h4>
+      <div class="when">Use when: output is off and you can't tell why.</div>
+      <div class="cw"><button class="copybtn" data-copy="p7">Copy</button>
+      <div class="code" id="p7">Below is a prompt I wrote and the output it produced.
+
+Analyse the prompt against the RCTFX framework (Role, Context, Task,
+Format, eXamples/Constraints). For each of the five:
+- state whether it is present, weak, or missing
+- if weak or missing, name exactly what the model had to guess
+- write the one sentence I should add
+
+Then tell me which SINGLE component, if I fixed only that one,
+would most improve the output.
+
+<span class="g">PROMPT:</span> [PASTE]
+<span class="g">OUTPUT I GOT:</span> [PASTE]</div></div>
+    </div>
+
+    <div class="prompt">
+      <div class="cat">Automation · Session 5</div>
+      <h4>Exception rule</h4>
+      <div class="when">Use when: handing an automation the start button.</div>
+      <div class="cw"><button class="copybtn" data-copy="p8">Copy</button>
+      <div class="code" id="p8"><span class="h">EXCEPTION RULE</span>
+Run automatically unless ANY of the following is true. If any is true,
+stop, produce no output, and notify [PERSON] naming which rule fired:
+
+1. A required input is missing or older than [TIMEFRAME].
+2. The result crosses [THRESHOLD] — e.g. any RED status, any spend
+   over [AMOUNT], any external-facing publication.
+3. Confidence in any upstream stage is below [LEVEL].
+4. The source system returned an error or no data.
+
+<span class="c">// Never let an automation produce output it cannot justify.</span></div></div>
+    </div>
+
+    <div class="prompt">
+      <div class="cat">Governance · Session 7</div>
+      <h4>Output guardrail</h4>
+      <div class="when">Use when: anything the system produces could go outside the company.</div>
+      <div class="cw"><button class="copybtn" data-copy="p9">Copy</button>
+      <div class="code" id="p9"><span class="h">OUTPUT GUARDRAIL — run before anything is returned</span>
+
+Before returning your answer, check it against every rule below.
+If any fails, do not return the answer — return the failure instead.
+
+1. Every factual claim traces to a source in the input or knowledge base.
+2. No phrase from the banned-language list appears.
+3. No figure, statistic or date appears that was not supplied.
+4. No individual is named as the cause of a problem.
+5. If the output is external-facing, it is marked DRAFT — REQUIRES
+   HUMAN APPROVAL at the top.
+
+State explicitly which checks you ran and their results.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== VIDEOS ===== -->
+<section id="videos">
+  <div class="shead"><h2>▶️ Video Guides</h2></div>
+  <p class="ssub">Short, current, and worth your time. Search these exact titles.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">Obsidian</h3>
+      <ul class="vidlist">
+        <li><span class="lvl start">Start here</span><b>"Obsidian for Beginners: Complete Setup"</b>
+          <span class="why">Covers download, vault creation, and folder structure — everything
+            Session 1 needs. Watch the first 8 minutes only.</span></li>
+        <li><span class="lvl start">Start here</span><b>"Obsidian in 10 Minutes"</b>
+          <span class="why">The fastest useful overview if you only have one coffee break.</span></li>
+        <li><span class="lvl mid">Optional</span><b>"Obsidian Linking &amp; Backlinks Explained"</b>
+          <span class="why">Only if you want to go deeper. Not required for any session.</span></li>
+      </ul>
+      <div class="callout" style="margin-top:12px">
+        <b>Skip the rabbit hole.</b> Obsidian has a huge plugin community and you need none of it.
+        Folders and plain notes are the whole requirement.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Claude &amp; Cowork</h3>
+      <ul class="vidlist">
+        <li><span class="lvl start">Start here</span><b>Anthropic's official Claude Projects walkthrough</b>
+          <span class="why">On the Anthropic YouTube channel. Projects, knowledge, and instructions —
+            exactly what Sessions 1–3 use.</span></li>
+        <li><span class="lvl start">Start here</span><b>"Claude Projects: Custom Instructions"</b>
+          <span class="why">The system-instruction concept, which is where RCTFX lives.</span></li>
+        <li><span class="lvl mid">Session 3</span><b>"What is MCP? Model Context Protocol explained"</b>
+          <span class="why">Watch before Session 3 if connectors feel like magic. Our
+            <a href="visuals.html#mcp">MCP diagram</a> covers the same ground faster.</span></li>
+      </ul>
+      <div class="callout good" style="margin-top:12px">
+        <b>Instructor walkthroughs</b> (Obsidian setup, workspace setup) are being recorded and will be
+        posted to <b>#ts-team-cohort</b> and linked here.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section id="faq">
+  <div class="shead"><h2>❓ FAQ</h2></div>
+  <p class="ssub">The questions that came up most. Answered properly.</p>
+
+  <div class="faq">
+    <button class="faqq">Do I need Notion? Do I need a paid plan? <span class="arw">▾</span></button>
+    <div class="faqa"><div class="inner">
+      <b>No, and no.</b> Notion is one of several places a connector can point at — nothing in the cohort
+      requires it. If your team already works in <b>Google Drive</b> or <b>Slack</b>, connect that instead;
+      the Session 3 exercise is identical.
+      <br><br>If you do want to try Notion, the <b>free plan is enough</b> for everything we do.
+      The only tool you genuinely need is <b>Claude</b>, and <b>Obsidian</b> which is free.
+    </div></div>
+  </div>
+
+  <div class="faq">
+    <button class="faqq">I couldn't finish setting up in the session. Am I behind? <span class="arw">▾</span></button>
+    <div class="faqa"><div class="inner">
+      No. Every Build Lab workbook is designed to work <b>in class or as homework</b> — same content,
+      same steps, and your answers save automatically in the browser.
+      <br><br>Sessions now include extra setup time and a 10-minute Q&amp;A window at the start
+      specifically for catching up. If you're stuck on something specific, post it in
+      <b>#ts-team-cohort</b> with a screenshot and it gets answered before the next session.
+    </div></div>
+  </div>
+
+  <div class="faq">
+    <button class="faqq">Where do I find the deck, resources and homework for a session? <span class="arw">▾</span></button>
+    <div class="faqa"><div class="inner">
+      All of it is on this page, in the <b><a href="#sessions">All Sessions</a></b> grid at the top —
+      published <b>before</b> the session, not after. Each session card links to its theory visuals,
+      Build Lab workbook, and prep guide. The session Drive folder holds the original deck files.
+    </div></div>
+  </div>
+
+  <div class="faq">
+    <button class="faqq">What's the difference between the deck, the Build Lab, and the prep guide? <span class="arw">▾</span></button>
+    <div class="faqa"><div class="inner">
+      <b>Prep guide</b> — read <i>before</i>. What to bring, what to think about, what to expect.<br>
+      <b>Deck</b> — what Felipe presents <i>during</i>. The teaching narrative.<br>
+      <b>Build Lab workbook</b> — what <i>you</i> work in. Theory, step-by-step exercises with fields
+      that save as you type, a self-check, and an export button so you can hand your work to your team.<br>
+      <b>Visual Theory Library</b> — the diagrams from every session in one reference page you keep forever.
+    </div></div>
+  </div>
+
+  <div class="faq">
+    <button class="faqq">My connector returns nothing. What now? <span class="arw">▾</span></button>
+    <div class="faqa"><div class="inner">
+      <b>Check permission scope first</b> — that's the cause roughly nine times out of ten.
+      Then check the resource is actually shared with the account you authorised with.
+      <br><br>Test with the simplest possible retrieval ("list the 5 most recent items") rather than a
+      complex question. If a simple one works and a complex one doesn't, the connector is fine and
+      your prompt is the problem.
+    </div></div>
+  </div>
+
+  <div class="faq">
+    <button class="faqq">The model ignores my knowledge document. Why? <span class="arw">▾</span></button>
+    <div class="faqa"><div class="inner">
+      Your instructions never told it the document <b>wins</b>. Without an explicit conflict-resolution
+      line, general knowledge quietly competes with your base and often beats it.
+      <br><br>Add: <i>"Treat [DOCUMENT NAME] as the authoritative standard. When it conflicts with your
+      general knowledge, follow the document."</i>
+    </div></div>
+  </div>
+
+  <div class="faq">
+    <button class="faqq">Can I use ChatGPT or Gemini instead of Claude? <span class="arw">▾</span></button>
+    <div class="faqa"><div class="inner">
+      The <b>concepts are fully portable</b> — RCTFX, knowledge layers, pipelines and guardrails work on any
+      capable model. The <b>click-by-click steps aren't</b>, because projects, connectors and skills are
+      named and arranged differently in each product.
+      <br><br>The cohort teaches on Claude Cowork. If you need to deliver on a different model at work,
+      build it here first, then port the structure — that translation is a good exercise in itself.
+    </div></div>
+  </div>
+
+  <div class="faq">
+    <button class="faqq">How much time should this take outside the sessions? <span class="arw">▾</span></button>
+    <div class="faqa"><div class="inner">
+      <b>Roughly 30–45 minutes a week.</b> Homework is deliberately small — the goal is repetition on real
+      work, not a second big build. Every session's homework is three items, and one of them is usually
+      just "keep a log."
+      <br><br>The students who get the most out of this are the ones who run their build on <b>real work</b>
+      three times during the week, not the ones who spend three hours perfecting it once.
+    </div></div>
+  </div>
+
+  <div class="faq">
+    <button class="faqq">What if I miss a session? <span class="arw">▾</span></button>
+    <div class="faqa"><div class="inner">
+      Everything you need is on this page and the Build Lab workbook is fully self-guided — theory,
+      steps, self-check and troubleshooting all included. Work through it at your own pace, then bring
+      anything unclear to the 10-minute Q&amp;A at the start of the next session.
+      <br><br>The one thing to watch: each layer builds on the last. If you miss Session 3's knowledge
+      layer, Session 4's pipeline will underperform — so prioritise catching up before the next session
+      rather than after.
+    </div></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Cohort Resource Hub &nbsp;|&nbsp; Talent Scout AI Marketing-Operator Cohort &nbsp;|&nbsp;
+  Questions in <a href="#" onclick="return false;">#ts-team-cohort</a> &nbsp;|&nbsp;
+  gettalentscout.com/ai-cohort
+</footer>
+
+<script>
+  var navButtons = document.querySelectorAll('.nav button');
+  navButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.dataset.target);
+      if(t){ t.scrollIntoView({behavior:'smooth', block:'start'}); }
+    });
+  });
+  var sections = document.querySelectorAll('main section');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 100;
+    sections.forEach(function(sec){
+      if(sec.offsetTop <= pos && (sec.offsetTop + sec.offsetHeight) > pos){
+        navButtons.forEach(function(b){ b.classList.remove('active'); });
+        var m = document.querySelector('.nav button[data-target="'+sec.id+'"]');
+        if(m) m.classList.add('active');
+      }
+    });
+  });
+
+  document.querySelectorAll('.faqq').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var body = btn.nextElementSibling;
+      var isOpen = btn.classList.contains('open');
+      document.querySelectorAll('.faqq').forEach(function(b){
+        b.classList.remove('open');
+        b.nextElementSibling.style.maxHeight = null;
+      });
+      if(!isOpen){
+        btn.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 'px';
+      }
+    });
+  });
+
+  document.querySelectorAll('.copybtn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el = document.getElementById(btn.dataset.copy);
+      if(!el) return;
+      var text = el.innerText;
+      var done = function(){
+        var old = btn.textContent;
+        btn.textContent = '✓ Copied';
+        setTimeout(function(){ btn.textContent = old; }, 1400);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done, function(){ fb(text, done); });
+      } else { fb(text, done); }
+    });
+  });
+  function fb(text, cb){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); cb(); }catch(e){}
+    document.body.removeChild(ta);
+  }
+</script>
+
+</body>
+</html>

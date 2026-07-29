@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session 4 Build Lab — Sub-Agents &amp; Pipelines</title>
+<style>
+  :root{
+    --navy:#0c2d5e; --navy-dark:#081d3f; --blue:#2d6cad; --blue-light:#eaf2fb;
+    --green:#2e9e52; --green-light:#eaf8ee; --orange:#e2622d; --orange-light:#fdeee7;
+    --gold:#e8a63d; --gold-light:#fdf3e1; --purple:#7c5cbf; --purple-light:#f0ebfa;
+    --red:#d64545; --red-light:#fdecec; --cyan:#1a9aa8; --cyan-light:#e6f6f8;
+    --ink:#1b2430; --muted:#5b6472; --line:#dfe4ea; --bg:#f4f6f9; --white:#fff;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.55;}
+  a{color:var(--blue);}
+
+  .hero{background:linear-gradient(135deg,var(--purple) 0%,var(--navy-dark) 100%);color:#fff;
+    padding:34px 24px 26px;text-align:center;}
+  .hero .eyebrow{letter-spacing:2.5px;font-size:11.5px;color:#d8caf5;font-weight:700;
+    text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:clamp(26px,4.6vw,40px);margin:0 0 8px;font-weight:800;}
+  .hero .tag{font-size:16px;color:#e5dcf7;margin-bottom:16px;}
+  .meta{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;font-size:13.5px;color:#ddd2f5;}
+  .meta b{color:#fff;}
+
+  .roles{background:#fff;border-bottom:1px solid var(--line);padding:12px;
+    display:flex;justify-content:center;gap:8px;flex-wrap:wrap;position:sticky;top:0;z-index:60;
+    box-shadow:0 2px 10px rgba(10,30,60,.06);}
+  .roles .lbl{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--muted);
+    align-self:center;text-transform:uppercase;margin-right:4px;}
+  .rolebtn{border:2px solid var(--line);background:#fff;color:var(--muted);font-weight:700;
+    font-size:13px;padding:8px 16px;border-radius:22px;cursor:pointer;transition:all .15s;}
+  .rolebtn:hover{border-color:var(--purple);color:var(--purple);}
+  .rolebtn.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+
+  .progwrap{background:var(--navy-dark);padding:10px 24px;}
+  .ptrack{max-width:900px;margin:0 auto;background:rgba(255,255,255,.14);border-radius:20px;height:9px;overflow:hidden;}
+  .pfill{background:linear-gradient(90deg,var(--gold),#8be0a5);height:100%;width:0%;
+    transition:width .4s ease;border-radius:20px;}
+  .ptext{text-align:center;font-size:12px;color:#cfdcf0;margin-top:7px;}
+
+  main{max-width:1000px;margin:0 auto;padding:28px 20px 70px;}
+  section{margin-bottom:38px;scroll-margin-top:80px;}
+  .shead{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+  .shead h2{font-size:22px;margin:0;}
+  .stepnum{width:34px;height:34px;border-radius:10px;background:var(--purple);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;flex-shrink:0;}
+  .ssub{color:var(--muted);font-size:13.5px;font-style:italic;margin:0 0 16px 46px;}
+  .timebox{display:inline-block;background:var(--gold-light);color:#a76c1c;border-radius:6px;
+    padding:2px 9px;font-size:11.5px;font-weight:800;margin-left:8px;}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;
+    margin-bottom:16px;box-shadow:0 1px 3px rgba(10,30,60,.05);}
+  .card.theory{border-left:4px solid var(--purple);}
+  .card.doit{border-left:4px solid var(--green);}
+  .card.warn{border-left:4px solid var(--red);}
+  .card h3{margin:0 0 8px;font-size:17px;}
+  .kicker{font-size:10.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+    color:var(--purple);margin-bottom:6px;}
+  .kicker.g{color:var(--green);} .kicker.r{color:var(--red);} .kicker.o{color:#a76c1c;}
+
+  svg.fig{display:block;width:100%;height:auto;margin:14px 0 6px;}
+
+  ol.steps{margin:10px 0 0;padding-left:0;list-style:none;counter-reset:s;}
+  ol.steps li{counter-increment:s;position:relative;padding:9px 0 9px 38px;font-size:14.5px;
+    border-bottom:1px dashed var(--line);}
+  ol.steps li:last-child{border-bottom:none;}
+  ol.steps li::before{content:counter(s);position:absolute;left:0;top:9px;width:24px;height:24px;
+    border-radius:7px;background:var(--green-light);color:var(--green);font-weight:800;font-size:12.5px;
+    display:flex;align-items:center;justify-content:center;}
+
+  .work{margin-top:16px;}
+  .work label{display:block;font-size:12.5px;font-weight:800;color:var(--navy);
+    margin-bottom:5px;letter-spacing:.3px;}
+  .work textarea{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:11px;
+    font-family:inherit;font-size:13.5px;resize:vertical;min-height:80px;background:#fcfdfe;}
+  .work textarea:focus{outline:none;border-color:var(--purple);background:#fff;}
+  .work .hint{font-size:11.5px;color:var(--muted);margin-top:4px;}
+
+  .code{background:#0f1b2d;color:#dbe7f5;border-radius:11px;padding:16px 18px;
+    font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px;line-height:1.75;
+    overflow-x:auto;position:relative;white-space:pre-wrap;}
+  .code .h{color:#b79dfb;font-weight:700;}
+  .code .g{color:#66d9a0;font-weight:700;}
+  .code .r{color:#ff9d9d;font-weight:700;}
+  .code .c{color:#7d8fa8;font-style:italic;}
+  .copybtn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.12);border:none;
+    color:#dbe7f5;font-size:11px;font-weight:700;padding:5px 11px;border-radius:6px;cursor:pointer;}
+  .copybtn:hover{background:rgba(255,255,255,.25);}
+  .codewrap{position:relative;margin-top:12px;}
+
+  .rolebox{display:none;}
+  .rolebox.on{display:block;}
+  .rolechip{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:1.2px;
+    padding:3px 10px;border-radius:20px;background:var(--purple-light);color:var(--purple);
+    text-transform:uppercase;margin-bottom:10px;}
+
+  .chk{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed var(--line);}
+  .chk:last-child{border-bottom:none;}
+  .chk input{margin-top:3px;width:18px;height:18px;accent-color:var(--green);flex-shrink:0;cursor:pointer;}
+  .chk label{cursor:pointer;font-size:14px;}
+  .chk.done label{color:#9aa4b2;text-decoration:line-through;}
+
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  @media (max-width:820px){.grid3{grid-template-columns:1fr;}}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px;}
+  th{text-align:left;background:var(--navy);color:#fff;padding:9px 11px;font-size:11px;
+    letter-spacing:1.1px;text-transform:uppercase;}
+  th:first-child{border-radius:7px 0 0 0;} th:last-child{border-radius:0 7px 0 0;}
+  td{padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top;}
+  tr:nth-child(even) td{background:#fafbfd;}
+
+  .stagecard{border:2px solid var(--purple);border-radius:12px;padding:16px;background:#fdfcff;}
+  .stagecard .sn{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--purple);
+    text-transform:uppercase;margin-bottom:6px;}
+  .stagecard h4{margin:0 0 8px;font-size:15px;}
+  .stagecard .fld{font-size:12.5px;margin-bottom:7px;}
+  .stagecard .fld b{color:var(--navy);}
+
+  .exportbar{position:fixed;bottom:0;left:0;right:0;background:var(--navy-dark);
+    padding:12px 20px;display:flex;justify-content:center;gap:12px;z-index:70;
+    box-shadow:0 -3px 14px rgba(0,0,0,.2);}
+  .exportbar button{border:none;border-radius:9px;padding:10px 20px;font-weight:800;
+    font-size:13.5px;cursor:pointer;}
+  .btn-primary{background:var(--green);color:#fff;}
+  .btn-primary:hover{background:#258443;}
+  .btn-ghost{background:rgba(255,255,255,.12);color:#fff;}
+  .btn-ghost:hover{background:rgba(255,255,255,.24);}
+  .savenote{color:#9db3d6;font-size:12px;align-self:center;}
+
+  footer{text-align:center;background:var(--navy-dark);color:#b9c9e4;font-size:12.5px;
+    padding:18px 18px 76px;}
+  footer a{color:#fff;}
+  ::selection{background:var(--gold);color:#1b2430;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">Talent Scout · AI Operator Cohort · Module 04</div>
+  <h1>Sub-Agents &amp; Pipelines</h1>
+  <div class="tag">One Agent Per Job. Handoffs In Between.</div>
+  <div class="meta">
+    <span><b>90 min</b> build</span>
+    <span><b>5</b> build steps</span>
+    <span><b>3</b> deliverables</span>
+    <span>Works in class <b>or</b> as homework</span>
+  </div>
+</div>
+
+<div class="roles">
+  <span class="lbl">Your role</span>
+  <button class="rolebtn on" data-role="hr">◈ HR Scouting Exec</button>
+  <button class="rolebtn" data-role="ct">◉ Content &amp; Social</button>
+  <button class="rolebtn" data-role="pm">▣ Project Manager</button>
+</div>
+
+<div class="progwrap">
+  <div class="ptrack"><div class="pfill" id="pfill"></div></div>
+  <div class="ptext" id="ptext">0 of 0 complete</div>
+</div>
+
+<main>
+
+<!-- ===== THEORY ===== -->
+<section id="theory">
+  <div class="shead"><div class="stepnum">◆</div><h2>The Idea</h2></div>
+  <p class="ssub">Read this before you build. Four minutes.</p>
+
+  <div class="card theory">
+    <div class="kicker">Theory 01</div>
+    <h3>Why One Agent Underperforms</h3>
+    <p style="color:var(--muted);font-size:14.5px;margin:0">Ask one agent to research, analyse, write and check,
+       and it silently trades quality between them. Each stage deserves its own instruction, its own constraints,
+       and its own definition of done.</p>
+
+    <svg class="fig" viewBox="0 0 860 240" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Pipeline, supervisor and debate patterns">
+      <text x="140" y="24" fill="#2e9e52" font-size="12.5" font-weight="800" text-anchor="middle">PIPELINE — build this today</text>
+      <g>
+        <rect x="34" y="42" width="58" height="42" rx="9" fill="#2e9e52"/>
+        <text x="63" y="68" fill="#fff" font-size="12.5" font-weight="800" text-anchor="middle">A</text>
+        <path d="M 98 63 L 116 63" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 122 63 l -8 -5 l 0 10 z" fill="#5b6472"/>
+        <rect x="126" y="42" width="58" height="42" rx="9" fill="#2e9e52"/>
+        <text x="155" y="68" fill="#fff" font-size="12.5" font-weight="800" text-anchor="middle">B</text>
+        <path d="M 190 63 L 208 63" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 214 63 l -8 -5 l 0 10 z" fill="#5b6472"/>
+        <rect x="218" y="42" width="58" height="42" rx="9" fill="#2e9e52"/>
+        <text x="247" y="68" fill="#fff" font-size="12.5" font-weight="800" text-anchor="middle">C</text>
+      </g>
+      <text x="155" y="106" fill="#5b6472" font-size="11.5" text-anchor="middle">Each output feeds the next.</text>
+      <text x="155" y="123" fill="#5b6472" font-size="11.5" text-anchor="middle">Best when work has a natural order.</text>
+
+      <text x="450" y="24" fill="#7c5cbf" font-size="12.5" font-weight="800" text-anchor="middle">SUPERVISOR — the 2026 default</text>
+      <g>
+        <rect x="416" y="38" width="68" height="38" rx="9" fill="#7c5cbf"/>
+        <text x="450" y="62" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">COORD</text>
+        <path d="M 432 80 L 394 100" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 388 103 l 10 -1 l -4 -8 z" fill="#5b6472"/>
+        <path d="M 450 80 L 450 98" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 450 104 l -5 -9 l 10 0 z" fill="#5b6472"/>
+        <path d="M 468 80 L 506 100" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 512 103 l -6 -9 l -4 8 z" fill="#5b6472"/>
+        <rect x="358" y="106" width="56" height="38" rx="9" fill="#a78ede"/>
+        <text x="386" y="130" fill="#fff" font-size="11.5" font-weight="800" text-anchor="middle">S1</text>
+        <rect x="422" y="106" width="56" height="38" rx="9" fill="#a78ede"/>
+        <text x="450" y="130" fill="#fff" font-size="11.5" font-weight="800" text-anchor="middle">S2</text>
+        <rect x="486" y="106" width="56" height="38" rx="9" fill="#a78ede"/>
+        <text x="514" y="130" fill="#fff" font-size="11.5" font-weight="800" text-anchor="middle">S3</text>
+      </g>
+      <text x="450" y="166" fill="#5b6472" font-size="11.5" text-anchor="middle">Coordinator delegates, then assembles.</text>
+      <text x="450" y="183" fill="#5b6472" font-size="11.5" text-anchor="middle">Use for anything non-linear.</text>
+
+      <text x="740" y="24" fill="#e8a63d" font-size="12.5" font-weight="800" text-anchor="middle">DEBATE — high stakes only</text>
+      <g>
+        <rect x="650" y="42" width="62" height="38" rx="9" fill="#e8a63d"/>
+        <text x="681" y="66" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">FOR</text>
+        <rect x="768" y="42" width="62" height="38" rx="9" fill="#e8a63d"/>
+        <text x="799" y="66" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">AGAINST</text>
+        <path d="M 718 61 L 762 61" stroke="#d64545" stroke-width="2" stroke-dasharray="4 3"/>
+        <path d="M 712 61 l 8 -5 l 0 10 z" fill="#d64545"/>
+        <path d="M 768 61 l -8 -5 l 0 10 z" fill="#d64545"/>
+        <path d="M 681 84 L 722 102" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 728 105 l -6 -9 l -4 8 z" fill="#5b6472"/>
+        <path d="M 799 84 L 758 102" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 752 105 l 10 -1 l -4 -8 z" fill="#5b6472"/>
+        <rect x="706" y="108" width="68" height="38" rx="9" fill="#0c2d5e"/>
+        <text x="740" y="132" fill="#fff" font-size="10.5" font-weight="800" text-anchor="middle">JUDGE</text>
+      </g>
+      <text x="740" y="166" fill="#5b6472" font-size="11.5" text-anchor="middle">Two argue, a third adjudicates.</text>
+      <text x="740" y="183" fill="#5b6472" font-size="11.5" text-anchor="middle">Expensive. Great for judgement calls.</text>
+
+      <line x1="310" y1="36" x2="310" y2="192" stroke="#dfe4ea" stroke-width="1.5"/>
+      <line x1="592" y1="36" x2="592" y2="192" stroke="#dfe4ea" stroke-width="1.5"/>
+      <text x="430" y="220" fill="#0c2d5e" font-size="12" font-weight="700" text-anchor="middle">
+        Three stages is usually the ceiling. Merge any two that never vary independently.</text>
+    </svg>
+  </div>
+
+  <div class="card theory">
+    <div class="kicker">Theory 02</div>
+    <h3>The Handoff Is the Hard Part</h3>
+    <p style="color:var(--muted);font-size:14.5px;margin:0">Pipelines rarely fail <i>inside</i> a stage.
+       They fail in the gap between two stages, because nobody defined what crosses it.</p>
+
+    <svg class="fig" viewBox="0 0 860 270" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Handoff contract with four properties between stage A and stage B">
+      <rect x="14" y="80" width="158" height="100" rx="12" fill="#7c5cbf"/>
+      <text x="93" y="116" fill="#fff" font-size="14" font-weight="800" text-anchor="middle">STAGE A</text>
+      <text x="93" y="138" fill="#e5dcf7" font-size="11.5" text-anchor="middle">gathers only</text>
+      <text x="93" y="158" fill="#e5dcf7" font-size="11.5" text-anchor="middle">makes no judgement</text>
+
+      <rect x="688" y="80" width="158" height="100" rx="12" fill="#7c5cbf"/>
+      <text x="767" y="116" fill="#fff" font-size="14" font-weight="800" text-anchor="middle">STAGE B</text>
+      <text x="767" y="138" fill="#e5dcf7" font-size="11.5" text-anchor="middle">judges only</text>
+      <text x="767" y="158" fill="#e5dcf7" font-size="11.5" text-anchor="middle">gathers nothing new</text>
+
+      <rect x="200" y="52" width="460" height="160" rx="13" fill="#fdf3e1"
+            stroke="#e8a63d" stroke-width="2.5" stroke-dasharray="8 5"/>
+      <text x="430" y="76" fill="#a76c1c" font-size="12.5" font-weight="800" text-anchor="middle">
+        ⚠ THE HANDOFF — WHERE PIPELINES ACTUALLY BREAK</text>
+
+      <rect x="216" y="88" width="212" height="54" rx="9" fill="#fff" stroke="#e8a63d"/>
+      <text x="230" y="107" fill="#1b2430" font-size="12" font-weight="800">CONTRACT</text>
+      <text x="230" y="124" fill="#5b6472" font-size="11">The exact structure A must</text>
+      <text x="230" y="137" fill="#5b6472" font-size="11">produce for B.</text>
+
+      <rect x="436" y="88" width="208" height="54" rx="9" fill="#fff" stroke="#e8a63d"/>
+      <text x="450" y="107" fill="#1b2430" font-size="12" font-weight="800">COMPLETENESS</text>
+      <text x="450" y="124" fill="#5b6472" font-size="11">What B does when a field</text>
+      <text x="450" y="137" fill="#5b6472" font-size="11">is missing.</text>
+
+      <rect x="216" y="150" width="212" height="54" rx="9" fill="#fff" stroke="#e8a63d"/>
+      <text x="230" y="169" fill="#1b2430" font-size="12" font-weight="800">PROVENANCE</text>
+      <text x="230" y="186" fill="#5b6472" font-size="11">Each stage carries its</text>
+      <text x="230" y="199" fill="#5b6472" font-size="11">sources forward.</text>
+
+      <rect x="436" y="150" width="208" height="54" rx="9" fill="#fff" stroke="#e8a63d"/>
+      <text x="450" y="169" fill="#1b2430" font-size="12" font-weight="800">STOP CONDITION</text>
+      <text x="450" y="186" fill="#5b6472" font-size="11">When a stage refuses to</text>
+      <text x="450" y="199" fill="#5b6472" font-size="11">pass anything on.</text>
+
+      <path d="M 178 130 L 196 130" stroke="#7c5cbf" stroke-width="3"/>
+      <path d="M 202 130 l -9 -5 l 0 10 z" fill="#7c5cbf"/>
+      <path d="M 664 130 L 682 130" stroke="#7c5cbf" stroke-width="3"/>
+      <path d="M 688 130 l -9 -5 l 0 10 z" fill="#7c5cbf"/>
+
+      <text x="430" y="238" fill="#d64545" font-size="12.5" font-weight="700" text-anchor="middle">
+        A pipeline that always produces output will happily produce confident garbage.</text>
+      <text x="430" y="258" fill="#5b6472" font-size="11.5" text-anchor="middle" font-style="italic">
+        Every stage needs a stop condition that can actually fire.</text>
+    </svg>
+
+    <div class="work">
+      <label>⚡ Quick check — in your own words, what is a "stop condition" and why does a pipeline need one?</label>
+      <textarea data-k="t2" placeholder="A rule that makes a stage refuse to pass anything downstream. Without it the pipeline always produces something, even when the input was garbage..."></textarea>
+      <div class="hint">Saved in your browser as you type.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== YOUR PIPELINE ===== -->
+<section id="pipeline">
+  <div class="shead"><div class="stepnum">▦</div><h2>Your Pipeline</h2></div>
+  <p class="ssub">Three stages, three specialists. Here's your exact split.</p>
+
+  <div class="card theory">
+    <!-- HR -->
+    <div class="rolebox on" data-role="hr">
+      <span class="rolechip">◈ HR Scouting Exec</span>
+      <p style="color:var(--muted);font-size:14px;margin:0 0 12px">
+        Screening a candidate well means sourcing evidence, judging it against a standard, and writing it up.
+        One agent doing all three does none properly.</p>
+      <div class="grid3">
+        <div class="stagecard"><div class="sn">Stage 1</div><h4>Evidence Extractor</h4>
+          <div class="fld"><b>Role:</b> extract only. Pull every factual claim — employers, dates, titles,
+            technologies, scope, outcomes. Make no judgement.</div>
+          <div class="fld"><b>Output:</b> table of claim | source line | confidence (stated / implied / absent).</div>
+          <div class="fld"><b>Stop:</b> if the profile is unreadable or under 100 words, return
+            <code>INSUFFICIENT INPUT</code> and stop.</div></div>
+        <div class="stagecard"><div class="sn">Stage 2</div><h4>Scorecard Assessor</h4>
+          <div class="fld"><b>Role:</b> judge only. Map each scorecard requirement to the evidence supporting it.</div>
+          <div class="fld"><b>Input rule:</b> accepts only stage 1's table. If confidence is 'implied',
+            treat it as unevidenced.</div>
+          <div class="fld"><b>Stop:</b> if more than half the must-haves are Not Evidenced, return
+            <code>NO</code> with reasons — do not proceed to write-up.</div></div>
+        <div class="stagecard"><div class="sn">Stage 3</div><h4>Hiring Manager Brief</h4>
+          <div class="fld"><b>Role:</b> communicate only. Turn stage 2 into a 90-second read.</div>
+          <div class="fld"><b>Output:</b> verdict, two decisive factors, three probing questions aimed at
+            Partial items, open risks.</div>
+          <div class="fld"><b>Constraint:</b> may not introduce any claim absent from stage 1's table.</div></div>
+      </div>
+      <div class="card warn" style="margin-top:14px;padding:14px 16px;box-shadow:none">
+        <div class="kicker o">The part people miss</div>
+        <div style="font-size:13.5px">Stage 2's stop condition saves the most time.
+          <b>Killing a clear No before write-up is the entire point of a pipeline.</b></div>
+      </div>
+      <div class="codewrap"><button class="copybtn" data-copy="p-hr">Copy all three stages</button>
+      <div class="code" id="p-hr"><span class="h">STAGE 1 — EVIDENCE EXTRACTOR</span>
+Role: extract only. Pull every factual claim from the profile: employers, dates,
+titles, technologies, scope, outcomes. Make no judgement.
+<span class="g">Output contract:</span> a table of claim | source line | confidence (stated / implied / absent).
+<span class="r">Stop condition:</span> if the profile is unreadable or under 100 words, return
+INSUFFICIENT INPUT and stop.
+
+<span class="h">STAGE 2 — SCORECARD ASSESSOR</span>
+Role: judge only. Take stage 1's table and map each requirement in the scorecard
+to the evidence supporting it.
+<span class="g">Input requirement:</span> will only accept a stage 1 table. If a claim's confidence is
+'implied', treat it as unevidenced.
+<span class="g">Output contract:</span> requirement | evidence reference | verdict (Evidenced / Partial /
+Not Evidenced).
+<span class="r">Stop condition:</span> if more than half the must-haves are Not Evidenced, return NO with
+reasons and stop — do not proceed to write-up.
+
+<span class="h">STAGE 3 — HIRING MANAGER BRIEF</span>
+Role: communicate only. Turn stage 2's assessment into a 90-second read.
+<span class="g">Output contract:</span> verdict, the two decisive factors, three probing questions aimed at
+Partial items, open risks.
+<span class="r">Constraint:</span> may not introduce any claim absent from stage 1's table.</div></div>
+    </div>
+
+    <!-- CT -->
+    <div class="rolebox" data-role="ct">
+      <span class="rolechip">◉ Content &amp; Social</span>
+      <p style="color:var(--muted);font-size:14px;margin:0 0 12px">
+        A good content brief needs scanning, angle-finding, and drafting. Merge them and the draft quietly
+        reshapes the research to fit itself.</p>
+      <div class="grid3">
+        <div class="stagecard"><div class="sn">Stage 1</div><h4>Signal Scanner</h4>
+          <div class="fld"><b>Role:</b> gather only. Collect what is actually being observed on the platforms
+            in scope.</div>
+          <div class="fld"><b>Output:</b> signal | platform | date observed | source | strength
+            (strong / emerging / weak).</div>
+          <div class="fld"><b>Stop:</b> if fewer than three sourced signals exist, return
+            <code>THIN EVIDENCE</code> and stop.</div></div>
+        <div class="stagecard"><div class="sn">Stage 2</div><h4>Angle Generator</h4>
+          <div class="fld"><b>Role:</b> interpret only. Produce content angles our audience would care about.</div>
+          <div class="fld"><b>Input rule:</b> may only build angles on <b>strong</b> or <b>emerging</b> signals.
+            Weak may be listed, never built on.</div>
+          <div class="fld"><b>Constraint:</b> no drafting. Angles only.</div></div>
+        <div class="stagecard"><div class="sn">Stage 3</div><h4>Drafter</h4>
+          <div class="fld"><b>Role:</b> write only. Draft one selected angle to the platform rules in the
+            knowledge base.</div>
+          <div class="fld"><b>Input rule:</b> accepts exactly one angle plus its supporting signals.</div>
+          <div class="fld"><b>Constraint:</b> may not add a claim not present in the supporting signals.
+            Must pass the banned-language check.</div></div>
+      </div>
+      <div class="card warn" style="margin-top:14px;padding:14px 16px;box-shadow:none">
+        <div class="kicker o">The part people miss</div>
+        <div style="font-size:13.5px">Stage 3's rule against adding claims is what stops the draft from
+          <b>inventing a statistic to make the hook land better.</b></div>
+      </div>
+      <div class="codewrap"><button class="copybtn" data-copy="p-ct">Copy all three stages</button>
+      <div class="code" id="p-ct"><span class="h">STAGE 1 — SIGNAL SCANNER</span>
+Role: gather only. Collect what is actually being observed on the platforms in scope.
+<span class="g">Output contract:</span> signal | platform | date observed | source | strength (strong /
+emerging / weak).
+<span class="r">Stop condition:</span> if fewer than three sourced signals exist, return THIN EVIDENCE
+and stop.
+
+<span class="h">STAGE 2 — ANGLE GENERATOR</span>
+Role: interpret only. Take stage 1's signals and produce content angles our audience
+would care about.
+<span class="g">Input requirement:</span> may only build angles on signals rated strong or emerging.
+Weak signals may be listed but not built on.
+<span class="g">Output contract:</span> angle | which signals support it | why this audience cares | risk of
+the angle ageing.
+<span class="r">Constraint:</span> no drafting. Angles only.
+
+<span class="h">STAGE 3 — DRAFTER</span>
+Role: write only. Take one selected angle and draft to the platform rules in the
+knowledge base.
+<span class="g">Input requirement:</span> accepts exactly one angle plus its supporting signals.
+<span class="r">Constraint:</span> may not add a claim not present in the supporting signals. Must pass the
+banned-language check before returning.</div></div>
+    </div>
+
+    <!-- PM -->
+    <div class="rolebox" data-role="pm">
+      <span class="rolechip">▣ Project Manager</span>
+      <p style="color:var(--muted);font-size:14px;margin:0 0 12px">
+        A status update needs collection, analysis, and communication. Do them together and the narrative
+        starts editing the facts.</p>
+      <div class="grid3">
+        <div class="stagecard"><div class="sn">Stage 1</div><h4>Activity Collector</h4>
+          <div class="fld"><b>Role:</b> collect only. Pull the period's activity per workstream from the
+            connected tracker.</div>
+          <div class="fld"><b>Output:</b> workstream | items completed | items slipped | new blockers |
+            last activity date.</div>
+          <div class="fld"><b>Stop:</b> any workstream with no activity is marked <code>NO SIGNAL</code>
+            and listed separately — never omitted.</div></div>
+        <div class="stagecard"><div class="sn">Stage 2</div><h4>Risk Analyst</h4>
+          <div class="fld"><b>Role:</b> analyse only. Apply the RAG thresholds from the knowledge base.</div>
+          <div class="fld"><b>Input rule:</b> accepts only stage 1's table. May not gather new information.</div>
+          <div class="fld"><b>Stop:</b> if a RAG cannot be set from available data, return
+            <code>NEEDS INPUT</code> naming the missing field.</div></div>
+        <div class="stagecard"><div class="sn">Stage 3</div><h4>Sponsor Briefer</h4>
+          <div class="fld"><b>Role:</b> communicate only. Turn stage 2 into the sponsor-facing update.</div>
+          <div class="fld"><b>Constraint:</b> may not change any RAG set by stage 2.</div>
+          <div class="fld"><b>Constraint:</b> must isolate the single sponsor-actionable item.
+            Maximum 200 words.</div></div>
+      </div>
+      <div class="card warn" style="margin-top:14px;padding:14px 16px;box-shadow:none">
+        <div class="kicker o">The part people miss</div>
+        <div style="font-size:13.5px">Stage 3 being forbidden from changing a RAG is the governance move.
+          <b>It separates who judges from who presents.</b></div>
+      </div>
+      <div class="codewrap"><button class="copybtn" data-copy="p-pm">Copy all three stages</button>
+      <div class="code" id="p-pm"><span class="h">STAGE 1 — ACTIVITY COLLECTOR</span>
+Role: collect only. Pull the period's activity per workstream from the connected
+tracker.
+<span class="g">Output contract:</span> workstream | items completed | items slipped | new blockers |
+last activity date.
+<span class="r">Stop condition:</span> any workstream with no activity is marked NO SIGNAL and listed
+separately — never omitted.
+
+<span class="h">STAGE 2 — RISK ANALYST</span>
+Role: analyse only. Apply the RAG thresholds from the knowledge base to stage 1's data.
+<span class="g">Input requirement:</span> accepts only stage 1's table. May not gather new information.
+<span class="g">Output contract:</span> workstream | RAG | the threshold that set it | movement vs last
+period | risk vs issue classification.
+<span class="r">Stop condition:</span> if a RAG cannot be set from available data, return NEEDS INPUT
+naming the missing field.
+
+<span class="h">STAGE 3 — SPONSOR BRIEFER</span>
+Role: communicate only. Turn stage 2 into the sponsor-facing update.
+<span class="r">Constraint:</span> may not change any RAG set by stage 2. Must isolate the single
+sponsor-actionable item. Maximum 200 words.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STEP 1 ===== -->
+<section id="s1">
+  <div class="shead"><div class="stepnum">1</div><h2>Map before you build<span class="timebox">12 MIN</span></h2></div>
+  <p class="ssub">Goal: the pipeline on paper. Building before mapping is the classic mistake.</p>
+
+  <div class="card doit">
+    <div class="kicker g">Do this now</div>
+    <ol class="steps">
+      <li>Write your workflow as a <b>single sentence</b>, then underline every distinct verb.</li>
+      <li>Each underlined verb is a candidate stage. Merge any two that <b>always</b> happen together.</li>
+      <li>For each gap between stages, write the handoff: exactly what crosses, in what structure.</li>
+    </ol>
+
+    <div class="rolebox on" data-role="hr">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--purple-light);border-radius:9px;font-size:14px">
+        <b>◈ Your split:</b> Extract → Assess → Brief.</div></div>
+    <div class="rolebox" data-role="ct">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--purple-light);border-radius:9px;font-size:14px">
+        <b>◉ Your split:</b> Scan → Angle → Draft.</div></div>
+    <div class="rolebox" data-role="pm">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--purple-light);border-radius:9px;font-size:14px">
+        <b>▣ Your split:</b> Collect → Analyse → Brief.</div></div>
+
+    <div class="work">
+      <label>✍️ Your workflow in one sentence — with the verbs marked</label>
+      <textarea data-k="s1a" placeholder="I *read* the CV, *check* it against the scorecard, and *write* a summary for the hiring manager."></textarea>
+    </div>
+    <div class="work">
+      <label>🔗 Handoff 1→2: exactly what crosses, in what structure?</label>
+      <textarea data-k="s1b" placeholder="A markdown table with columns: claim | source line | confidence. Nothing else."></textarea>
+    </div>
+    <div class="work">
+      <label>🔗 Handoff 2→3: exactly what crosses, in what structure?</label>
+      <textarea data-k="s1c" placeholder="A table: requirement | evidence reference | verdict. Plus the overall verdict line."></textarea>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 15px;background:var(--green-light);border-radius:9px;
+                font-size:13.5px;color:#1d6b38">
+      <b>✓ You know it worked when:</b> three stages on paper, with the handoff structure written for each gap.
+    </div>
+  </div>
+</section>
+
+<!-- ===== STEP 2 ===== -->
+<section id="s2">
+  <div class="shead"><div class="stepnum">2</div><h2>Build stage one<span class="timebox">15 MIN</span></h2></div>
+  <p class="ssub">Goal: the gathering stage. Make it refuse to judge.</p>
+
+  <div class="card doit">
+    <div class="kicker g">Do this now</div>
+    <ol class="steps">
+      <li>Create the first specialist with an RCTFX prompt. Its <b>ROLE</b> must be a gatherer.</li>
+      <li>Add the explicit line: <i>"Make no judgement and draw no conclusion. Extraction only."</i></li>
+      <li>Define the output contract as a table with <b>named columns</b>.</li>
+      <li>Add the stop condition — what makes it refuse to continue.</li>
+    </ol>
+
+    <div class="rolebox on" data-role="hr">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--red-light);border-radius:9px;font-size:13.5px;color:#9b2c2c">
+        <b>◈ It must NOT decide fit.</b> Only what the profile claims, and where.</div></div>
+    <div class="rolebox" data-role="ct">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--red-light);border-radius:9px;font-size:13.5px;color:#9b2c2c">
+        <b>◉ It must NOT choose angles.</b> Only what was observed, where, and when.</div></div>
+    <div class="rolebox" data-role="pm">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--red-light);border-radius:9px;font-size:13.5px;color:#9b2c2c">
+        <b>▣ It must NOT set RAG.</b> Only what happened per workstream.</div></div>
+
+    <div class="work">
+      <label>🤖 Paste your stage 1 prompt</label>
+      <textarea data-k="s2a" style="min-height:130px" placeholder="ROLE: Act as an evidence extractor who..."></textarea>
+    </div>
+    <div class="work">
+      <label>🧪 Run it on real input. Did it return structured data and ZERO opinions?</label>
+      <textarea data-k="s2b" placeholder="Yes — but it added a 'seems strong' note in the last column. Removed by adding 'no adjectives' to the constraint."></textarea>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 15px;background:var(--green-light);border-radius:9px;
+                font-size:13.5px;color:#1d6b38">
+      <b>✓ You know it worked when:</b> you ran it on real input and it returned structured data and zero opinions.
+    </div>
+  </div>
+</section>
+
+<!-- ===== STEP 3 ===== -->
+<section id="s3">
+  <div class="shead"><div class="stepnum">3</div><h2>Build stage two and wire the handoff<span class="timebox">18 MIN</span></h2></div>
+  <p class="ssub">Goal: the judgement stage, accepting only stage one's structure.</p>
+
+  <div class="card doit">
+    <div class="kicker g">Do this now</div>
+    <ol class="steps">
+      <li>Create the second specialist. Its <b>first instruction</b> is the input requirement:
+          it only accepts stage one's table format.</li>
+      <li>Add the rule for missing fields — <b>explicitly</b>. Never leave it to inference.</li>
+      <li>Add its own stop condition.</li>
+      <li>Paste stage one's <b>real output</b> into it and run.</li>
+    </ol>
+
+    <div class="rolebox on" data-role="hr">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--purple-light);border-radius:9px;font-size:13.5px">
+        <b>◈ Your rule:</b> 'implied' confidence counts as unevidenced. State it explicitly.</div></div>
+    <div class="rolebox" data-role="ct">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--purple-light);border-radius:9px;font-size:13.5px">
+        <b>◉ Your rule:</b> only strong and emerging signals may support an angle.</div></div>
+    <div class="rolebox" data-role="pm">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--purple-light);border-radius:9px;font-size:13.5px">
+        <b>▣ Your rule:</b> RAG comes only from the documented thresholds.</div></div>
+
+    <div class="work">
+      <label>🤖 Paste your stage 2 prompt</label>
+      <textarea data-k="s3a" style="min-height:130px" placeholder="INPUT REQUIREMENT: This agent accepts only a table with columns..."></textarea>
+    </div>
+    <div class="work">
+      <label>🔗 Did stage 2 run on stage 1's real output without you reformatting anything by hand?</label>
+      <textarea data-k="s3b" placeholder="Almost — it wanted a header row I hadn't specified. Added 'first row must be the column names' to stage 1's contract."></textarea>
+      <div class="hint">If you had to hand-fix the format, the contract is incomplete. That's the lesson.</div>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 15px;background:var(--green-light);border-radius:9px;
+                font-size:13.5px;color:#1d6b38">
+      <b>✓ You know it worked when:</b> stage two ran on stage one's real output without you reformatting
+      anything by hand.
+    </div>
+  </div>
+</section>
+
+<!-- ===== STEP 4 ===== -->
+<section id="s4">
+  <div class="shead"><div class="stepnum">4</div><h2>Build stage three and run end to end<span class="timebox">18 MIN</span></h2></div>
+  <p class="ssub">Goal: the full pipeline, on real input, once through.</p>
+
+  <div class="card doit">
+    <div class="kicker g">Do this now</div>
+    <ol class="steps">
+      <li>Create the communication stage. Its defining constraint is what it may <b>NOT</b> do —
+          introduce new claims, or change a prior judgement.</li>
+      <li>Run the whole chain from real raw input to final output.</li>
+      <li><b>Trace one sentence</b> in the final output all the way back to the raw input.
+          If you can't, a handoff is leaking.</li>
+    </ol>
+
+    <div class="rolebox on" data-role="hr">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--gold-light);border-radius:9px;font-size:13.5px;color:#7a5416">
+        <b>◈ Trace test:</b> trace one line of the hiring brief back to a line in the CV.</div></div>
+    <div class="rolebox" data-role="ct">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--gold-light);border-radius:9px;font-size:13.5px;color:#7a5416">
+        <b>◉ Trace test:</b> trace one claim in the draft back to a sourced signal.</div></div>
+    <div class="rolebox" data-role="pm">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--gold-light);border-radius:9px;font-size:13.5px;color:#7a5416">
+        <b>▣ Trace test:</b> trace the RAG in the sponsor update back to a threshold and an activity record.</div></div>
+
+    <div class="work">
+      <label>🤖 Paste your stage 3 prompt</label>
+      <textarea data-k="s4a" style="min-height:110px" placeholder="CONSTRAINT: may not introduce any claim not present in the input..."></textarea>
+    </div>
+    <div class="work">
+      <label>🔍 The trace — one final sentence, walked back to raw input</label>
+      <textarea data-k="s4b" style="min-height:110px" placeholder="Brief says 'shipped without a spec twice'. → Stage 2 row: 'autonomy | claim #7 | Evidenced'. → Stage 1 claim #7: 'led greenfield rewrite, self-directed' from CV line 12."></textarea>
+      <div class="hint">This trace is your proof of governance. It's what makes the system auditable.</div>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 15px;background:var(--green-light);border-radius:9px;
+                font-size:13.5px;color:#1d6b38">
+      <b>✓ You know it worked when:</b> one complete run, and you traced a final sentence back to raw input.
+    </div>
+  </div>
+</section>
+
+<!-- ===== STEP 5 ===== -->
+<section id="s5">
+  <div class="shead"><div class="stepnum" style="background:var(--red)">5</div><h2>Break it on purpose<span class="timebox">12 MIN</span></h2></div>
+  <p class="ssub">Goal: find the failure point now instead of in production.</p>
+
+  <div class="card warn">
+    <div class="kicker r">Do this now</div>
+    <ol class="steps">
+      <li>Feed stage one <b>deliberately incomplete</b> input. Does its stop condition fire, or does it improvise?</li>
+      <li>Feed stage two a <b>malformed handoff</b>. Does it reject it, or does it guess the structure?</li>
+      <li>Whichever stage improvised is your <b>weakest link</b>. Tighten its input requirement and re-test.</li>
+    </ol>
+
+    <div class="rolebox on" data-role="hr">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--red-light);border-radius:9px;font-size:13.5px;color:#9b2c2c">
+        <b>◈ Try:</b> a two-line profile. It should return <code>INSUFFICIENT INPUT</code>.</div></div>
+    <div class="rolebox" data-role="ct">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--red-light);border-radius:9px;font-size:13.5px;color:#9b2c2c">
+        <b>◉ Try:</b> one weak unsourced signal. It should return <code>THIN EVIDENCE</code>.</div></div>
+    <div class="rolebox" data-role="pm">
+      <div style="margin-top:14px;padding:12px 15px;background:var(--red-light);border-radius:9px;font-size:13.5px;color:#9b2c2c">
+        <b>▣ Try:</b> a period with two silent workstreams. Both should appear as <code>NO SIGNAL</code>.</div></div>
+
+    <div class="work">
+      <label>💥 Which stage broke first, and what did you change?</label>
+      <textarea data-k="s5a" placeholder="Stage 1 improvised — it invented a plausible employment history from a 2-line profile. Added: 'if fewer than 5 extractable claims, return INSUFFICIENT INPUT'. Re-tested: fires correctly."></textarea>
+    </div>
+
+    <div style="margin-top:16px;padding:12px 15px;background:var(--green-light);border-radius:9px;
+                font-size:13.5px;color:#1d6b38">
+      <b>✓ You know it worked when:</b> you know which stage fails first and you have tightened it once.
+    </div>
+  </div>
+</section>
+
+<!-- ===== CHECKPOINT ===== -->
+<section id="check">
+  <div class="shead"><div class="stepnum" style="background:var(--green)">✓</div><h2>Before You Close the Laptop</h2></div>
+  <p class="ssub">Tick each one. Anything unticked goes to #ts-team-cohort tonight.</p>
+
+  <div class="card">
+    <div class="chk"><input type="checkbox" id="c1"><label for="c1">Three stages exist, each with one job and one verb.</label></div>
+    <div class="chk"><input type="checkbox" id="c2"><label for="c2">Every gap has a written handoff contract with named fields.</label></div>
+    <div class="chk"><input type="checkbox" id="c3"><label for="c3">Every stage has a stop condition that can fire.</label></div>
+    <div class="chk"><input type="checkbox" id="c4"><label for="c4">One full end-to-end run completed on real input.</label></div>
+    <div class="chk"><input type="checkbox" id="c5"><label for="c5">I traced a final sentence back to raw input, and I know which stage breaks first.</label></div>
+  </div>
+</section>
+
+<!-- ===== TROUBLESHOOTING ===== -->
+<section id="fix">
+  <div class="shead"><div class="stepnum" style="background:var(--red)">!</div><h2>When It Doesn't Work</h2></div>
+  <p class="ssub">Every one of these has a cause you can name and a fix you can apply in under two minutes.</p>
+
+  <div class="card warn">
+    <table>
+      <tr><th style="width:26%">Symptom</th><th style="width:37%">Actual cause</th><th style="width:37%">The fix</th></tr>
+      <tr><td><b>Stage two reinterprets stage one</b></td>
+          <td>No input requirement, so it treats the handoff as a loose suggestion.</td>
+          <td>Make the first line of stage two the input contract, with named fields it will refuse without.</td></tr>
+      <tr><td><b>Final output contains claims from nowhere</b></td>
+          <td>The last stage is allowed to add material.</td>
+          <td>Add: "may not introduce any claim not present in the input." Then re-run the trace test.</td></tr>
+      <tr><td><b>The pipeline is slower than doing it manually</b></td>
+          <td>Too many stages for the size of the job.</td>
+          <td>Merge any two stages that never vary independently. Three is usually the ceiling for this work.</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== LEVEL UP ===== -->
+<section id="levelup">
+  <div class="shead"><div class="stepnum">↑</div><h2>If You Finish Early</h2></div>
+  <p class="ssub">Add a supervisor above your pipeline — the pattern that became the 2026 default.</p>
+
+  <div class="card" style="border-left:4px solid var(--purple)">
+    <div class="rolebox on" data-role="hr">
+      <b>◈ Challenge:</b> add a coordinator that decides whether a profile even needs full screening,
+      or can be rejected on a single must-have.
+    </div>
+    <div class="rolebox" data-role="ct">
+      <b>◉ Challenge:</b> add a coordinator that routes strong signals to drafting and weak ones to a
+      watchlist automatically.
+    </div>
+    <div class="rolebox" data-role="pm">
+      <b>▣ Challenge:</b> add a coordinator that decides whether this period warrants a full status
+      or a one-line "no material change".
+    </div>
+    <div class="work">
+      <label>🧪 What happened?</label>
+      <textarea data-k="lvl" placeholder="The coordinator rejected 3 of 10 profiles before stage 1 even ran — cut the batch time roughly in half."></textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOMEWORK ===== -->
+<section id="hw">
+  <div class="shead"><div class="stepnum" style="background:var(--gold)">→</div><h2>Before Session 5</h2></div>
+  <p class="ssub">Small on purpose. The goal is repetition on real work.</p>
+
+  <div class="card" style="border-left:4px solid var(--gold)">
+    <div class="chk"><input type="checkbox" id="h1"><label for="h1">Run the pipeline three times on real work this week.</label></div>
+    <div class="chk"><input type="checkbox" id="h2"><label for="h2">Log where it broke and which stage owned the break.</label></div>
+    <div class="chk"><input type="checkbox" id="h3"><label for="h3">Bring the log to Session 5 — <b>we automate the trigger that starts it.</b></label></div>
+
+    <div class="work">
+      <label>📓 Your break log — run, what broke, which stage owned it</label>
+      <textarea data-k="hwlog" style="min-height:110px" placeholder="Run 1 (Tue) — stage 2 marked a must-have Evidenced from an implied claim. Stage 2 owned it. Tightened the 'implied = unevidenced' line.&#10;Run 2 (Wed) — clean.&#10;Run 3 (Fri) — stage 3 added a salary figure not in the input. Stage 3 owned it."></textarea>
+    </div>
+
+    <div style="margin-top:16px;padding:14px 16px;background:var(--blue-light);border-radius:9px;font-size:13.5px">
+      <b>Next up — Session 5:</b> Triggers. Everything you built still waits for you to press run.
+      Next week you hand over the start button — on a schedule and on an event — and build the exception
+      path that decides when to hand it back.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="exportbar">
+  <span class="savenote">💾 Auto-saved in this browser</span>
+  <button class="btn-primary" id="exportBtn">⬇ Export my work</button>
+  <button class="btn-ghost" id="printBtn">🖨 Print / PDF</button>
+  <button class="btn-ghost" id="clearBtn">Clear</button>
+</div>
+
+<footer>
+  Session 4 Build Lab &nbsp;|&nbsp; Talent Scout AI Marketing-Operator Cohort &nbsp;|&nbsp;
+  Questions in <a href="#" onclick="return false;">#ts-team-cohort</a>
+</footer>
+
+<script>
+(function(){
+  var PREFIX = 'ts_s4lab_';
+
+  var roleBtns = document.querySelectorAll('.rolebtn');
+  function setRole(r){
+    roleBtns.forEach(function(b){ b.classList.toggle('on', b.dataset.role === r); });
+    document.querySelectorAll('.rolebox').forEach(function(box){
+      box.classList.toggle('on', box.dataset.role === r);
+    });
+    try{ localStorage.setItem(PREFIX+'role', r); }catch(e){}
+  }
+  roleBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setRole(b.dataset.role); });
+  });
+  var savedRole = null;
+  try{ savedRole = localStorage.getItem(PREFIX+'role'); }catch(e){}
+  setRole(savedRole || 'hr');
+
+  var areas = document.querySelectorAll('textarea[data-k]');
+  areas.forEach(function(ta){
+    var key = PREFIX + 'txt_' + ta.dataset.k;
+    try{ var v = localStorage.getItem(key); if(v) ta.value = v; }catch(e){}
+    ta.addEventListener('input', function(){
+      try{ localStorage.setItem(key, ta.value); }catch(e){}
+      refresh();
+    });
+  });
+
+  var boxes = document.querySelectorAll('.chk input[type=checkbox]');
+  boxes.forEach(function(cb){
+    var key = PREFIX + 'chk_' + cb.id;
+    try{ if(localStorage.getItem(key) === '1'){ cb.checked = true; cb.closest('.chk').classList.add('done'); } }catch(e){}
+    cb.addEventListener('change', function(){
+      cb.closest('.chk').classList.toggle('done', cb.checked);
+      try{ localStorage.setItem(key, cb.checked ? '1' : '0'); }catch(e){}
+      refresh();
+    });
+  });
+
+  function refresh(){
+    var doneBoxes = 0;
+    boxes.forEach(function(cb){ if(cb.checked) doneBoxes++; });
+    var doneAreas = 0;
+    areas.forEach(function(t){ if(t.value.trim().length > 12) doneAreas++; });
+    var total = boxes.length + areas.length;
+    var done = doneBoxes + doneAreas;
+    var pct = total ? Math.round(done / total * 100) : 0;
+    document.getElementById('pfill').style.width = pct + '%';
+    document.getElementById('ptext').textContent = done + ' of ' + total + ' complete — ' + pct + '%';
+  }
+  refresh();
+
+  document.querySelectorAll('.copybtn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el = document.getElementById(btn.dataset.copy);
+      if(!el) return;
+      var text = el.innerText;
+      var done = function(){
+        var old = btn.textContent;
+        btn.textContent = '✓ Copied';
+        setTimeout(function(){ btn.textContent = old; }, 1400);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done, function(){ fallback(text, done); });
+      } else { fallback(text, done); }
+    });
+  });
+  function fallback(text, cb){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); cb(); }catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  var LABELS = {
+    t2:'What a stop condition is, in my words',
+    s1a:'My workflow in one sentence',
+    s1b:'Handoff 1 → 2',
+    s1c:'Handoff 2 → 3',
+    s2a:'Stage 1 prompt',
+    s2b:'Stage 1 test result',
+    s3a:'Stage 2 prompt',
+    s3b:'Handoff test result',
+    s4a:'Stage 3 prompt',
+    s4b:'The trace — final sentence back to raw input',
+    s5a:'Which stage broke first, and the fix',
+    lvl:'Supervisor challenge result',
+    hwlog:'Break log'
+  };
+  document.getElementById('exportBtn').addEventListener('click', function(){
+    var roleName = {hr:'HR Scouting Exec', ct:'Content & Social', pm:'Project Manager'};
+    var r = document.querySelector('.rolebtn.on');
+    var lines = [];
+    lines.push('# SESSION 4 BUILD LAB — SUB-AGENTS & PIPELINES');
+    lines.push('');
+    lines.push('Role: ' + (r ? roleName[r.dataset.role] : '—'));
+    lines.push('Exported: ' + new Date().toLocaleString());
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+    areas.forEach(function(ta){
+      lines.push('## ' + (LABELS[ta.dataset.k] || ta.dataset.k));
+      lines.push('');
+      lines.push(ta.value.trim() ? ta.value.trim() : '_(not completed)_');
+      lines.push('');
+    });
+    lines.push('---');
+    lines.push('');
+    lines.push('## CHECKPOINT');
+    lines.push('');
+    boxes.forEach(function(cb){
+      var lbl = document.querySelector('label[for="' + cb.id + '"]');
+      lines.push('- [' + (cb.checked ? 'x' : ' ') + '] ' + (lbl ? lbl.innerText.trim() : cb.id));
+    });
+    lines.push('');
+    lines.push('_Talent Scout AI Marketing-Operator Cohort — Session 4_');
+
+    var blob = new Blob([lines.join('\n')], {type:'text/markdown;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'Session4-Pipelines-MyWork.md';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  });
+
+  document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
+
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    if(!confirm('Clear everything you typed on this page? This cannot be undone.')) return;
+    areas.forEach(function(ta){
+      ta.value = '';
+      try{ localStorage.removeItem(PREFIX + 'txt_' + ta.dataset.k); }catch(e){}
+    });
+    boxes.forEach(function(cb){
+      cb.checked = false;
+      cb.closest('.chk').classList.remove('done');
+      try{ localStorage.removeItem(PREFIX + 'chk_' + cb.id); }catch(e){}
+    });
+    refresh();
+  });
+})();
+</script>
+
+</body>
+</html>

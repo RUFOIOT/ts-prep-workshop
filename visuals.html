@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visual Theory Library — Talent Scout AI Operator Cohort</title>
+<style>
+  :root{
+    --navy:#0c2d5e; --navy-dark:#081d3f; --blue:#2d6cad; --blue-light:#eaf2fb;
+    --green:#2e9e52; --green-light:#eaf8ee; --orange:#e2622d; --orange-light:#fdeee7;
+    --gold:#e8a63d; --gold-light:#fdf3e1; --purple:#7c5cbf; --purple-light:#f0ebfa;
+    --red:#d64545; --red-light:#fdecec; --cyan:#1a9aa8; --cyan-light:#e6f6f8;
+    --ink:#1b2430; --muted:#5b6472; --line:#dfe4ea; --bg:#f4f6f9; --white:#fff;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.55;}
+  a{color:var(--blue);}
+
+  .hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-dark) 100%);color:#fff;
+    padding:40px 24px 32px;text-align:center;}
+  .hero .eyebrow{letter-spacing:2.5px;font-size:12px;color:#9db3d6;font-weight:700;
+    text-transform:uppercase;margin-bottom:14px;}
+  .hero h1{font-size:clamp(28px,5vw,46px);margin:0 0 12px;font-weight:800;letter-spacing:0.5px;}
+  .hero p{max-width:660px;margin:0 auto;color:#cfdcf0;font-size:15.5px;}
+
+  .nav{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line);
+    display:flex;justify-content:center;gap:3px;padding:10px 12px;flex-wrap:wrap;
+    box-shadow:0 2px 10px rgba(10,30,60,0.06);}
+  .nav button{border:none;background:transparent;color:var(--muted);font-weight:700;font-size:12.5px;
+    padding:8px 13px;border-radius:20px;cursor:pointer;transition:all .15s ease;}
+  .nav button:hover{background:var(--blue-light);color:var(--blue);}
+  .nav button.active{background:var(--navy);color:#fff;}
+
+  main{max-width:1180px;margin:0 auto;padding:30px 20px 70px;}
+  section{margin-bottom:54px;scroll-margin-top:70px;}
+  .section-head h2{font-size:24px;margin:0 0 4px;letter-spacing:0.2px;}
+  .section-sub{color:var(--muted);font-size:14px;font-style:italic;margin-bottom:20px;}
+
+  .fig{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px;
+    margin-bottom:20px;box-shadow:0 1px 3px rgba(10,30,60,.05);}
+  .fig-title{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+    color:var(--blue);margin-bottom:4px;}
+  .fig h3{margin:0 0 6px;font-size:19px;}
+  .fig .lead{color:var(--muted);font-size:14.5px;margin:0 0 20px;max-width:76ch;}
+  .fig svg{display:block;width:100%;height:auto;}
+  .caption{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+    font-size:13.5px;color:var(--muted);}
+  .caption b{color:var(--ink);}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;}
+  @media (max-width:820px){.grid2{grid-template-columns:1fr;}}
+
+  /* logo cards */
+  .logogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+  .logocard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;
+    text-align:center;transition:all .2s ease;}
+  .logocard:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(10,30,60,.1);
+    border-color:var(--blue);}
+  .logocard svg{width:44px;height:44px;margin:0 auto 10px;display:block;}
+  .logocard .nm{font-weight:800;font-size:14.5px;}
+  .logocard .mk{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .logocard .use{font-size:12px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);
+    color:var(--ink);}
+  .badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:1px;
+    padding:2px 7px;border-radius:20px;margin-top:8px;text-transform:uppercase;}
+  .badge.core{background:var(--green-light);color:var(--green);}
+  .badge.opt{background:var(--gold-light);color:#a76c1c;}
+  .badge.alt{background:var(--blue-light);color:var(--blue);}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{text-align:left;background:var(--navy);color:#fff;padding:10px 12px;font-size:11.5px;
+    letter-spacing:1.2px;text-transform:uppercase;}
+  th:first-child{border-radius:8px 0 0 0;} th:last-child{border-radius:0 8px 0 0;}
+  td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+  tr:nth-child(even) td{background:#fafbfd;}
+
+  .callout{border-left:4px solid var(--gold);background:var(--gold-light);border-radius:8px;
+    padding:13px 16px;font-size:13.5px;color:#7a5416;margin-top:16px;}
+  .callout.good{border-left-color:var(--green);background:var(--green-light);color:#1d6b38;}
+  .callout.bad{border-left-color:var(--red);background:var(--red-light);color:#9b2c2c;}
+
+  footer{text-align:center;background:var(--navy-dark);color:#b9c9e4;font-size:12.5px;padding:20px;}
+  footer a{color:#fff;}
+  ::selection{background:var(--gold);color:#1b2430;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">Talent Scout · AI Marketing-Operator Cohort</div>
+  <h1>Visual Theory Library</h1>
+  <p>Every concept in the cohort, drawn. Use these in class, send them as pre-reading,
+     or come back to them when a build breaks and you need to see why.</p>
+</div>
+
+<nav class="nav" id="nav">
+  <button data-target="stack" class="active">The Stack</button>
+  <button data-target="tools">Tool Landscape</button>
+  <button data-target="modes">3 AI Modes</button>
+  <button data-target="rctfx">RCTFX</button>
+  <button data-target="knowledge">Knowledge (S3)</button>
+  <button data-target="mcp">MCP</button>
+  <button data-target="pipelines">Pipelines (S4)</button>
+  <button data-target="triggers">Triggers (S5)</button>
+  <button data-target="health">Stack Health (S6)</button>
+  <button data-target="guardrails">Guardrails (S7)</button>
+</nav>
+
+<main>
+
+<!-- ============ THE STACK ============ -->
+<section id="stack">
+  <div class="section-head"><h2>🏛 The Six-Layer Operator Stack</h2></div>
+  <div class="section-sub">The spine of the whole cohort. Every session adds exactly one layer.</div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 1 · The Master Diagram</div>
+    <h3>What You Are Building, Session by Session</h3>
+    <p class="lead">Each layer sits on the one below it. Skip a layer and everything above it wobbles —
+       an agent with no knowledge layer guesses, automation with no guardrails is a liability.</p>
+
+    <svg viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Six-layer operator stack from workspace foundation to capstone">
+      <defs>
+        <linearGradient id="l1" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#2d6cad"/><stop offset="100%" stop-color="#1c4c82"/></linearGradient>
+        <linearGradient id="l2" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#2e9e52"/><stop offset="100%" stop-color="#1f7a3c"/></linearGradient>
+        <linearGradient id="l3" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#1a9aa8"/><stop offset="100%" stop-color="#13757f"/></linearGradient>
+        <linearGradient id="l4" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#7c5cbf"/><stop offset="100%" stop-color="#5e429b"/></linearGradient>
+        <linearGradient id="l5" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#e8a63d"/><stop offset="100%" stop-color="#c9822a"/></linearGradient>
+        <linearGradient id="l6" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#d64545"/><stop offset="100%" stop-color="#a83232"/></linearGradient>
+      </defs>
+
+      <!-- layers, bottom to top -->
+      <g>
+        <rect x="120" y="380" width="660" height="56" rx="10" fill="url(#l1)"/>
+        <text x="146" y="404" fill="#fff" font-size="16" font-weight="800">Layer 1 · Workspace</text>
+        <text x="146" y="423" fill="#cfe0f5" font-size="12.5">Projects, system instructions, Obsidian vault — where the work lives</text>
+        <rect x="30" y="393" width="76" height="30" rx="15" fill="#fff" stroke="#2d6cad" stroke-width="2"/>
+        <text x="68" y="413" fill="#2d6cad" font-size="13" font-weight="800" text-anchor="middle">S1</text>
+      </g>
+      <g>
+        <rect x="120" y="316" width="660" height="56" rx="10" fill="url(#l2)"/>
+        <text x="146" y="340" fill="#fff" font-size="16" font-weight="800">Layer 2 · Instruction</text>
+        <text x="146" y="359" fill="#d6f2e0" font-size="12.5">RCTFX — turning a request into a repeatable brief</text>
+        <rect x="30" y="329" width="76" height="30" rx="15" fill="#fff" stroke="#2e9e52" stroke-width="2"/>
+        <text x="68" y="349" fill="#2e9e52" font-size="13" font-weight="800" text-anchor="middle">S2</text>
+      </g>
+      <g>
+        <rect x="120" y="252" width="660" height="56" rx="10" fill="url(#l3)"/>
+        <text x="146" y="276" fill="#fff" font-size="16" font-weight="800">Layer 3 · Knowledge</text>
+        <text x="146" y="295" fill="#d3f0f3" font-size="12.5">Intelligence base + live MCP connectors — what it knows about YOU</text>
+        <rect x="30" y="265" width="76" height="30" rx="15" fill="#fff" stroke="#1a9aa8" stroke-width="2"/>
+        <text x="68" y="285" fill="#1a9aa8" font-size="13" font-weight="800" text-anchor="middle">S3</text>
+      </g>
+      <g>
+        <rect x="120" y="188" width="660" height="56" rx="10" fill="url(#l4)"/>
+        <text x="146" y="212" fill="#fff" font-size="16" font-weight="800">Layer 4 · Specialisation</text>
+        <text x="146" y="231" fill="#e5dcf7" font-size="12.5">Sub-agents &amp; pipelines — one agent per job, contracts in between</text>
+        <rect x="30" y="201" width="76" height="30" rx="15" fill="#fff" stroke="#7c5cbf" stroke-width="2"/>
+        <text x="68" y="221" fill="#7c5cbf" font-size="13" font-weight="800" text-anchor="middle">S4</text>
+      </g>
+      <g>
+        <rect x="120" y="124" width="660" height="56" rx="10" fill="url(#l5)"/>
+        <text x="146" y="148" fill="#fff" font-size="16" font-weight="800">Layer 5 · Autonomy</text>
+        <text x="146" y="167" fill="#fbecd0" font-size="12.5">Triggers + stack health — it runs without you pressing anything</text>
+        <rect x="30" y="137" width="76" height="30" rx="15" fill="#fff" stroke="#e8a63d" stroke-width="2"/>
+        <text x="68" y="157" fill="#c9822a" font-size="13" font-weight="800" text-anchor="middle">S5·6</text>
+      </g>
+      <g>
+        <rect x="120" y="60" width="660" height="56" rx="10" fill="url(#l6)"/>
+        <text x="146" y="84" fill="#fff" font-size="16" font-weight="800">Layer 6 · Control</text>
+        <text x="146" y="103" fill="#fbdada" font-size="12.5">Guardrails + human gates — what it is never allowed to do</text>
+        <rect x="30" y="73" width="76" height="30" rx="15" fill="#fff" stroke="#d64545" stroke-width="2"/>
+        <text x="68" y="93" fill="#d64545" font-size="13" font-weight="800" text-anchor="middle">S7</text>
+      </g>
+
+      <!-- capstone flag -->
+      <g>
+        <rect x="300" y="14" width="300" height="32" rx="16" fill="#0c2d5e"/>
+        <text x="450" y="35" fill="#ffd98a" font-size="13" font-weight="800" text-anchor="middle">
+          S8 · CAPSTONE — ALL SIX RUNNING AS ONE</text>
+      </g>
+
+      <!-- upward arrow -->
+      <path d="M 820 420 L 820 70" stroke="#8a9bb0" stroke-width="2" stroke-dasharray="5 5"/>
+      <path d="M 820 60 l -6 12 l 12 0 z" fill="#8a9bb0"/>
+      <text x="836" y="250" fill="#5b6472" font-size="11.5" font-weight="700"
+            transform="rotate(90 836 250)" text-anchor="middle">INCREASING AUTONOMY</text>
+    </svg>
+
+    <div class="caption">
+      <b>How to teach this:</b> put this slide up in every session and point at the layer you're adding today.
+      Students who see the same map eight times stop asking "where are we?" and start asking better questions.
+    </div>
+  </div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 2 · The Payoff Curve</div>
+    <h3>Why the Order Matters</h3>
+    <p class="lead">Effort stays roughly flat each week. Leverage compounds — but only if the layers go on in order.</p>
+
+    <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Curve showing leverage compounding across eight sessions">
+      <line x1="70" y1="250" x2="850" y2="250" stroke="#dfe4ea" stroke-width="2"/>
+      <line x1="70" y1="30" x2="70" y2="250" stroke="#dfe4ea" stroke-width="2"/>
+      <text x="60" y="40" fill="#5b6472" font-size="11" text-anchor="end" font-weight="700">HIGH</text>
+      <text x="60" y="248" fill="#5b6472" font-size="11" text-anchor="end" font-weight="700">LOW</text>
+      <text x="30" y="150" fill="#5b6472" font-size="11.5" font-weight="700"
+            transform="rotate(-90 30 150)" text-anchor="middle">LEVERAGE</text>
+
+      <!-- flat effort line -->
+      <path d="M 110 200 L 190 197 L 270 202 L 350 198 L 430 200 L 510 199 L 590 201 L 670 198"
+            stroke="#8a9bb0" stroke-width="2.5" fill="none" stroke-dasharray="6 4"/>
+      <text x="690" y="202" fill="#8a9bb0" font-size="12" font-weight="700">effort (flat)</text>
+
+      <!-- compounding leverage -->
+      <path d="M 110 235 Q 250 228 350 205 T 520 140 T 670 55"
+            stroke="#2e9e52" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <text x="690" y="52" fill="#2e9e52" font-size="12.5" font-weight="800">leverage (compounds)</text>
+
+      <g font-size="11.5" fill="#5b6472" text-anchor="middle" font-weight="700">
+        <circle cx="110" cy="235" r="5" fill="#2d6cad"/><text x="110" y="272">S1</text>
+        <circle cx="190" cy="230" r="5" fill="#2e9e52"/><text x="190" y="272">S2</text>
+        <circle cx="270" cy="218" r="5" fill="#1a9aa8"/><text x="270" y="272">S3</text>
+        <circle cx="350" cy="205" r="5" fill="#7c5cbf"/><text x="350" y="272">S4</text>
+        <circle cx="430" cy="180" r="5" fill="#e8a63d"/><text x="430" y="272">S5</text>
+        <circle cx="510" cy="148" r="5" fill="#e8a63d"/><text x="510" y="272">S6</text>
+        <circle cx="590" cy="105" r="5" fill="#d64545"/><text x="590" y="272">S7</text>
+        <circle cx="670" cy="55" r="6" fill="#0c2d5e"/><text x="670" y="272">S8</text>
+      </g>
+    </svg>
+    <div class="caption">
+      <b>The line students need to hear:</b> "Week 1 you save minutes. Week 8 you save days.
+      Same two hours every week — the difference is what you're standing on."
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOOL LANDSCAPE ============ -->
+<section id="tools">
+  <div class="section-head"><h2>🧰 The Tool Landscape</h2></div>
+  <div class="section-sub">What each tool is for, and which ones you actually need to pay for</div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 3 · Model &amp; Tool Reference</div>
+    <h3>Who Makes What</h3>
+    <p class="lead">Students constantly ask which tool does what. This is the one-glance answer.
+       Cohort-required tools are marked CORE — everything else is context.</p>
+
+    <div class="logogrid">
+      <!-- Claude -->
+      <div class="logocard">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-label="Claude">
+          <rect width="40" height="40" rx="9" fill="#D97757"/>
+          <path d="M12.2 27.5 L17.9 12.5 h4.3 l5.7 15 h-3.9 l-1.2-3.4 h-5.6 l-1.2 3.4 z
+                   M18.2 21.1 h3.7 L20.05 15.7 z" fill="#fff"/>
+        </svg>
+        <div class="nm">Claude</div>
+        <div class="mk">Anthropic</div>
+        <div class="use">The model this cohort runs on. Cowork = the desktop app with file + tool access.</div>
+        <span class="badge core">Core</span>
+      </div>
+
+      <!-- ChatGPT -->
+      <div class="logocard">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-label="ChatGPT">
+          <rect width="40" height="40" rx="9" fill="#10A37F"/>
+          <path d="M20 9 a5 5 0 0 1 4.7 3.3 a5 5 0 0 1 4 7 a5 5 0 0 1 -4.7 7.9 a5 5 0 0 1 -8 0
+                   a5 5 0 0 1 -4.7 -7.9 a5 5 0 0 1 4 -7 A5 5 0 0 1 20 9 z"
+                fill="none" stroke="#fff" stroke-width="2.1" stroke-linejoin="round"/>
+          <path d="M20 15.6 v8.8 M16.2 17.8 l7.6 4.4 M16.2 22.2 l7.6 -4.4"
+                stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <div class="nm">ChatGPT</div>
+        <div class="mk">OpenAI</div>
+        <div class="use">The best-known alternative. Same RCTFX principles apply — the framework is portable.</div>
+        <span class="badge alt">Alternative</span>
+      </div>
+
+      <!-- Gemini -->
+      <div class="logocard">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-label="Gemini">
+          <rect width="40" height="40" rx="9" fill="#fff" stroke="#dfe4ea"/>
+          <defs><linearGradient id="gem" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4285F4"/><stop offset="50%" stop-color="#9B72CB"/>
+            <stop offset="100%" stop-color="#D96570"/></linearGradient></defs>
+          <path d="M20 8 C20 14.6 25.4 20 32 20 C25.4 20 20 25.4 20 32
+                   C20 25.4 14.6 20 8 20 C14.6 20 20 14.6 20 8 z" fill="url(#gem)"/>
+        </svg>
+        <div class="nm">Gemini</div>
+        <div class="mk">Google DeepMind</div>
+        <div class="use">Strongest native tie-in to Google Workspace. Worth knowing if your data lives in Drive.</div>
+        <span class="badge alt">Alternative</span>
+      </div>
+
+      <!-- Llama -->
+      <div class="logocard">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-label="Llama">
+          <rect width="40" height="40" rx="9" fill="#0866FF"/>
+          <path d="M13 26 c-2.4 0 -4 -2.2 -4 -5.4 c0 -3.9 2 -6.6 4.7 -6.6 c2.1 0 3.6 1.5 5.1 4.1
+                   l1.6 2.8 c0.9 1.6 1.6 2.4 2.5 2.4 c1.2 0 2 -1.1 2 -3 c0 -2.2 -0.9 -3.5 -2.2 -3.5
+                   c-0.8 0 -1.6 0.5 -2.5 1.6 l-1.5 -2.3 c1.4 -1.6 2.8 -2.4 4.3 -2.4 c3 0 5 2.6 5 6.5
+                   c0 3.6 -1.9 5.8 -4.6 5.8 c-1.9 0 -3.2 -0.9 -4.6 -3.3 l-1.7 -3 c-0.9 -1.6 -1.7 -2.5 -2.6 -2.5
+                   c-1.2 0 -2 1.2 -2 3.3 c0 2 0.8 3.2 1.9 3.2 c0.6 0 1.1 -0.2 1.7 -0.8 l1.3 2.3
+                   c-1.2 1.1 -2.4 1.6 -3.7 1.6 z" fill="#fff"/>
+        </svg>
+        <div class="nm">Llama</div>
+        <div class="mk">Meta</div>
+        <div class="use">Open-weights. Matters if your company needs models running on its own hardware.</div>
+        <span class="badge alt">Alternative</span>
+      </div>
+
+      <!-- Obsidian -->
+      <div class="logocard">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-label="Obsidian">
+          <rect width="40" height="40" rx="9" fill="#4A3B8C"/>
+          <path d="M22.5 7 L30 15.5 L26.5 31 L15 33 L9.5 24 L13.5 10.5 z" fill="#A88BFA"/>
+          <path d="M22.5 7 L26.5 31 L15 33 z" fill="#C7B4FD"/>
+          <path d="M13.5 10.5 L22.5 7 L15 33 L9.5 24 z" fill="#8B6FE8"/>
+        </svg>
+        <div class="nm">Obsidian</div>
+        <div class="mk">Free · obsidian.md</div>
+        <div class="use">Your second brain. Local markdown files — no account, no subscription, yours forever.</div>
+        <span class="badge core">Core · Free</span>
+      </div>
+
+      <!-- Slack -->
+      <div class="logocard">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-label="Slack">
+          <rect width="40" height="40" rx="9" fill="#fff" stroke="#dfe4ea"/>
+          <g transform="translate(8,8)">
+            <path d="M5 15 a2.5 2.5 0 1 1 -2.5 -2.5 H5 z M6.3 15 a2.5 2.5 0 0 1 5 0 v6.3
+                     a2.5 2.5 0 0 1 -5 0 z" fill="#E01E5A"/>
+            <path d="M9 5 a2.5 2.5 0 1 1 2.5 -2.5 V5 z M9 6.3 a2.5 2.5 0 0 1 0 5 H2.7
+                     a2.5 2.5 0 0 1 0 -5 z" fill="#36C5F0"/>
+            <path d="M19 9 a2.5 2.5 0 1 1 2.5 2.5 H19 z M17.7 9 a2.5 2.5 0 0 1 -5 0 V2.7
+                     a2.5 2.5 0 0 1 5 0 z" fill="#2EB67D"/>
+            <path d="M15 19 a2.5 2.5 0 1 1 -2.5 2.5 V19 z M15 17.7 a2.5 2.5 0 0 1 0 -5 h6.3
+                     a2.5 2.5 0 0 1 0 5 z" fill="#ECB22E"/>
+          </g>
+        </svg>
+        <div class="nm">Slack</div>
+        <div class="mk">Salesforce</div>
+        <div class="use">Your cohort channel <b>#ts-team-cohort</b>, and a live MCP connector target in S3.</div>
+        <span class="badge core">Core</span>
+      </div>
+
+      <!-- Notion -->
+      <div class="logocard">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-label="Notion">
+          <rect width="40" height="40" rx="9" fill="#fff" stroke="#dfe4ea"/>
+          <path d="M11 11.5 l16 -1.2 c1.2 -0.1 1.7 0.2 2.3 0.7 l2.4 1.9 c0.4 0.3 0.5 0.4 0.5 0.8
+                   v15.4 c0 0.8 -0.3 1.2 -1.2 1.3 l-17.4 1.1 c-0.8 0.05 -1.2 -0.1 -1.6 -0.6 l-2 -2.6
+                   c-0.4 -0.5 -0.6 -0.9 -0.6 -1.5 V12.8 c0 -0.7 0.3 -1.2 1.6 -1.3 z" fill="#111"/>
+          <path d="M27 10.3 l-16 1.2 c-1.3 0.1 -1.6 0.6 -1.6 1.3 l0 0.1 c0.5 0.35 1.3 0.45 2.3 0.38
+                   l15 -0.9 c0.65 -0.05 0.9 0.15 0.65 0.6 l-0.1 15.2 c0 0.4 0.15 0.55 0.6 0.5
+                   l1.5 -0.1 c0.6 -0.05 0.85 -0.3 0.85 -0.85 V13.7 c0 -0.4 -0.1 -0.5 -0.5 -0.8
+                   l-2.4 -1.9 c-0.6 -0.5 -1.1 -0.8 -2.3 -0.7 z" fill="#fff"/>
+          <path d="M14 16.4 v10.5 l2.1 -0.15 v-6.7 l4.6 6.4 l2.3 -0.15 V15.9 l-2.1 0.13 v6.3
+                   l-4.5 -6.15 z" fill="#fff"/>
+        </svg>
+        <div class="nm">Notion</div>
+        <div class="mk">Free plan works</div>
+        <div class="use"><b>Optional.</b> One of several connector targets — Google Drive or Slack work just as well.</div>
+        <span class="badge opt">Optional</span>
+      </div>
+
+      <!-- MCP -->
+      <div class="logocard">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-label="Model Context Protocol">
+          <rect width="40" height="40" rx="9" fill="#1b2430"/>
+          <circle cx="20" cy="20" r="4" fill="#fff"/>
+          <circle cx="10" cy="12" r="2.6" fill="#8A9BB0"/>
+          <circle cx="30" cy="12" r="2.6" fill="#8A9BB0"/>
+          <circle cx="10" cy="28" r="2.6" fill="#8A9BB0"/>
+          <circle cx="30" cy="28" r="2.6" fill="#8A9BB0"/>
+          <path d="M17 18 L12 13.5 M23 18 L28 13.5 M17 22 L12 26.5 M23 22 L28 26.5"
+                stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".85"/>
+        </svg>
+        <div class="nm">MCP</div>
+        <div class="mk">Open standard</div>
+        <div class="use">Model Context Protocol — the plug that lets Claude read your live systems. Session 3.</div>
+        <span class="badge core">Core concept</span>
+      </div>
+    </div>
+
+    <div class="callout">
+      <b>The Notion question, settled:</b> Notion is <b>not required</b> and you do <b>not</b> need a paid plan.
+      It is simply one place a connector can point at. If your team already lives in Google Drive or Slack,
+      connect that instead — the S3 exercise works identically. Free Notion is plenty if you want to try it.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 MODES ============ -->
+<section id="modes">
+  <div class="section-head"><h2>🎚 The Three Modes of AI Use</h2></div>
+  <div class="section-sub">Session 1's core idea — and the sentence that reframes the whole cohort</div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 4 · Mode Progression</div>
+    <h3>Tourist → Operator → Architect</h3>
+    <p class="lead">Most people never leave Mode 1. The entire cohort is a structured march to Mode 3.</p>
+
+    <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Three modes of AI use: generative, agentic, operator">
+      <!-- Mode 1 -->
+      <g>
+        <rect x="30" y="50" width="260" height="230" rx="14" fill="#fdecec" stroke="#d64545" stroke-width="2"/>
+        <rect x="30" y="50" width="260" height="42" rx="14" fill="#d64545"/>
+        <rect x="30" y="78" width="260" height="14" fill="#d64545"/>
+        <text x="160" y="78" fill="#fff" font-size="14" font-weight="800" text-anchor="middle">MODE 1 · GENERATIVE</text>
+        <text x="160" y="120" fill="#9b2c2c" font-size="19" font-weight="800" text-anchor="middle">The Tourist</text>
+        <text x="55" y="150" fill="#1b2430" font-size="12.5">You ask. It answers. You copy.</text>
+        <text x="55" y="172" fill="#5b6472" font-size="12">• Lives in one chat window</text>
+        <text x="55" y="192" fill="#5b6472" font-size="12">• Dies when you close the tab</text>
+        <text x="55" y="212" fill="#5b6472" font-size="12">• You are the whole workflow</text>
+        <text x="55" y="232" fill="#5b6472" font-size="12">• Output quality varies wildly</text>
+        <rect x="55" y="246" width="210" height="24" rx="6" fill="#fff"/>
+        <text x="160" y="262" fill="#d64545" font-size="11.5" font-weight="700" text-anchor="middle">SAVES: minutes</text>
+      </g>
+      <!-- arrow -->
+      <path d="M 296 165 L 318 165" stroke="#8a9bb0" stroke-width="2.5"/>
+      <path d="M 324 165 l -9 -5 l 0 10 z" fill="#8a9bb0"/>
+
+      <!-- Mode 2 -->
+      <g>
+        <rect x="330" y="50" width="260" height="230" rx="14" fill="#fdf3e1" stroke="#e8a63d" stroke-width="2"/>
+        <rect x="330" y="50" width="260" height="42" rx="14" fill="#e8a63d"/>
+        <rect x="330" y="78" width="260" height="14" fill="#e8a63d"/>
+        <text x="460" y="78" fill="#fff" font-size="14" font-weight="800" text-anchor="middle">MODE 2 · AGENTIC</text>
+        <text x="460" y="120" fill="#a76c1c" font-size="19" font-weight="800" text-anchor="middle">The Operator</text>
+        <text x="355" y="150" fill="#1b2430" font-size="12.5">You configure. It runs. You review.</text>
+        <text x="355" y="172" fill="#5b6472" font-size="12">• Lives in a project + skill</text>
+        <text x="355" y="192" fill="#5b6472" font-size="12">• Persists across sessions</text>
+        <text x="355" y="212" fill="#5b6472" font-size="12">• Reads your real knowledge</text>
+        <text x="355" y="232" fill="#5b6472" font-size="12">• Consistent output via RCTFX</text>
+        <rect x="355" y="246" width="210" height="24" rx="6" fill="#fff"/>
+        <text x="460" y="262" fill="#a76c1c" font-size="11.5" font-weight="700" text-anchor="middle">SAVES: hours</text>
+      </g>
+      <path d="M 596 165 L 618 165" stroke="#8a9bb0" stroke-width="2.5"/>
+      <path d="M 624 165 l -9 -5 l 0 10 z" fill="#8a9bb0"/>
+
+      <!-- Mode 3 -->
+      <g>
+        <rect x="630" y="50" width="250" height="230" rx="14" fill="#eaf8ee" stroke="#2e9e52" stroke-width="2"/>
+        <rect x="630" y="50" width="250" height="42" rx="14" fill="#2e9e52"/>
+        <rect x="630" y="78" width="250" height="14" fill="#2e9e52"/>
+        <text x="755" y="78" fill="#fff" font-size="14" font-weight="800" text-anchor="middle">MODE 3 · OPERATOR STACK</text>
+        <text x="755" y="120" fill="#1d6b38" font-size="19" font-weight="800" text-anchor="middle">The Architect</text>
+        <text x="655" y="150" fill="#1b2430" font-size="12.5">It runs. You govern.</text>
+        <text x="655" y="172" fill="#5b6472" font-size="12">• Pipeline of specialists</text>
+        <text x="655" y="192" fill="#5b6472" font-size="12">• Triggers itself on schedule</text>
+        <text x="655" y="212" fill="#5b6472" font-size="12">• Guardrails + human gates</text>
+        <text x="655" y="232" fill="#5b6472" font-size="12">• Works without you in the room</text>
+        <rect x="655" y="246" width="200" height="24" rx="6" fill="#fff"/>
+        <text x="755" y="262" fill="#1d6b38" font-size="11.5" font-weight="700" text-anchor="middle">SAVES: days</text>
+      </g>
+
+      <text x="450" y="24" fill="#0c2d5e" font-size="14" font-weight="800" text-anchor="middle">
+        WHERE 95% OF PEOPLE STOP  →  WHERE THIS COHORT TAKES YOU</text>
+      <text x="450" y="312" fill="#5b6472" font-size="13" text-anchor="middle" font-style="italic">
+        "A prompt is a conversation. An agent is infrastructure."</text>
+    </svg>
+    <div class="caption">
+      <b>Classroom use:</b> ask the room to self-place on this diagram in Session 1, then again in Session 8.
+      The movement is the proof the cohort worked.
+    </div>
+  </div>
+</section>
+
+<!-- ============ RCTFX ============ -->
+<section id="rctfx">
+  <div class="section-head"><h2>🔑 RCTFX — Anatomy of a Production Prompt</h2></div>
+  <div class="section-sub">Session 2's framework, drawn as a machine with five inputs</div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 5 · The Five Layers</div>
+    <h3>Drop One and You Can Predict the Failure</h3>
+    <p class="lead">Each missing layer produces a specific, diagnosable symptom. This is what makes RCTFX
+       a debugging tool, not just a writing template.</p>
+
+    <svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="RCTFX five layers each with the failure that occurs when omitted">
+      <!-- input funnel -->
+      <g font-weight="800" font-size="26" text-anchor="middle">
+        <rect x="40" y="40" width="86" height="86" rx="16" fill="#2d6cad"/>
+        <text x="83" y="82" fill="#fff">R</text>
+        <text x="83" y="104" fill="#cfe0f5" font-size="11" font-weight="700">ROLE</text>
+
+        <rect x="40" y="136" width="86" height="86" rx="16" fill="#1a9aa8"/>
+        <text x="83" y="178" fill="#fff">C</text>
+        <text x="83" y="200" fill="#d3f0f3" font-size="11" font-weight="700">CONTEXT</text>
+
+        <rect x="40" y="232" width="86" height="86" rx="16" fill="#2e9e52"/>
+        <text x="83" y="274" fill="#fff">T</text>
+        <text x="83" y="296" fill="#d6f2e0" font-size="11" font-weight="700">TASK</text>
+      </g>
+      <g font-weight="800" font-size="26" text-anchor="middle">
+        <rect x="146" y="88" width="86" height="86" rx="16" fill="#e8a63d"/>
+        <text x="189" y="130" fill="#fff">F</text>
+        <text x="189" y="152" fill="#fbecd0" font-size="11" font-weight="700">FORMAT</text>
+
+        <rect x="146" y="184" width="86" height="86" rx="16" fill="#7c5cbf"/>
+        <text x="189" y="226" fill="#fff">X</text>
+        <text x="189" y="248" fill="#e5dcf7" font-size="11" font-weight="700">eXAMPLES</text>
+      </g>
+
+      <!-- arrows into engine -->
+      <path d="M 240 179 L 300 179" stroke="#8a9bb0" stroke-width="3"/>
+      <path d="M 308 179 l -10 -6 l 0 12 z" fill="#8a9bb0"/>
+
+      <!-- engine -->
+      <rect x="316" y="128" width="150" height="102" rx="14" fill="#0c2d5e"/>
+      <text x="391" y="168" fill="#fff" font-size="15" font-weight="800" text-anchor="middle">PRODUCTION</text>
+      <text x="391" y="190" fill="#fff" font-size="15" font-weight="800" text-anchor="middle">PROMPT</text>
+      <text x="391" y="212" fill="#9db3d6" font-size="11" text-anchor="middle">runs the same way every time</text>
+
+      <path d="M 474 179 L 534 179" stroke="#2e9e52" stroke-width="3"/>
+      <path d="M 542 179 l -10 -6 l 0 12 z" fill="#2e9e52"/>
+      <rect x="550" y="150" width="130" height="58" rx="12" fill="#eaf8ee" stroke="#2e9e52" stroke-width="2"/>
+      <text x="615" y="175" fill="#1d6b38" font-size="13" font-weight="800" text-anchor="middle">Output you</text>
+      <text x="615" y="194" fill="#1d6b38" font-size="13" font-weight="800" text-anchor="middle">paste, not rewrite</text>
+
+      <!-- failure map -->
+      <text x="712" y="46" fill="#d64545" font-size="11.5" font-weight="800">DROP IT → YOU GET</text>
+      <g font-size="11.5">
+        <rect x="700" y="56" width="180" height="40" rx="8" fill="#fdecec"/>
+        <text x="710" y="72" fill="#9b2c2c" font-weight="800">No R</text>
+        <text x="710" y="88" fill="#5b6472">Generic expert voice</text>
+
+        <rect x="700" y="102" width="180" height="40" rx="8" fill="#fdecec"/>
+        <text x="710" y="118" fill="#9b2c2c" font-weight="800">No C</text>
+        <text x="710" y="134" fill="#5b6472">A Wikipedia answer</text>
+
+        <rect x="700" y="148" width="180" height="40" rx="8" fill="#fdecec"/>
+        <text x="710" y="164" fill="#9b2c2c" font-weight="800">No T</text>
+        <text x="710" y="180" fill="#5b6472">Two half-answers</text>
+
+        <rect x="700" y="194" width="180" height="40" rx="8" fill="#fdecec"/>
+        <text x="710" y="210" fill="#9b2c2c" font-weight="800">No F</text>
+        <text x="710" y="226" fill="#5b6472">Right idea, wrong shape</text>
+
+        <rect x="700" y="240" width="180" height="40" rx="8" fill="#fdecec"/>
+        <text x="710" y="256" fill="#9b2c2c" font-weight="800">No X</text>
+        <text x="710" y="272" fill="#5b6472">Confidently wrong</text>
+      </g>
+
+      <text x="391" y="330" fill="#5b6472" font-size="12.5" text-anchor="middle" font-style="italic">
+        Diagnose backwards: name the symptom, and it names the missing layer.</text>
+    </svg>
+
+    <table style="margin-top:20px">
+      <tr><th style="width:14%">Layer</th><th style="width:28%">Answers the question</th>
+          <th style="width:29%">Weak version</th><th style="width:29%">Production version</th></tr>
+      <tr><td><b style="color:#2d6cad">R — Role</b></td><td>Who is Claude for this job?</td>
+          <td>"You are a marketer"</td>
+          <td>"Act as a technical sourcing specialist who has filled this role three times"</td></tr>
+      <tr><td><b style="color:#1a9aa8">C — Context</b></td><td>What can't it see?</td>
+          <td>"We're a B2B company"</td>
+          <td>"Last two hires failed at the same point — depth without autonomy"</td></tr>
+      <tr><td><b style="color:#2e9e52">T — Task</b></td><td>One verb, one deliverable</td>
+          <td>"Research and write a post"</td>
+          <td>"Draft one LinkedIn post from the findings below"</td></tr>
+      <tr><td><b style="color:#e8a63d">F — Format</b></td><td>Exact output structure</td>
+          <td>"Keep it short and punchy"</td>
+          <td>"Hook ≤12 words. 3 paragraphs, max 2 sentences each. No hashtags."</td></tr>
+      <tr><td><b style="color:#7c5cbf">X — eXamples</b></td><td>What good and bad look like</td>
+          <td>"Use our tone of voice"</td>
+          <td>"Good: 'Four of five teams dropped it in 90 days.' Bad: 'Struggling with adoption?'"</td></tr>
+    </table>
+
+    <div class="callout good">
+      <b>The single highest-yield habit:</b> spend most of your time on <b>C</b>. It is the most-skipped layer
+      and the one that changes judgements rather than just adding detail.
+    </div>
+  </div>
+</section>
+
+<!-- ============ KNOWLEDGE ============ -->
+<section id="knowledge">
+  <div class="section-head"><h2>📚 Session 3 — The Knowledge Layer</h2></div>
+  <div class="section-sub">Three places knowledge can live, and why only one of them scales</div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 6 · Knowledge Placement</div>
+    <h3>Where Does the Fact Come From?</h3>
+    <p class="lead">Every fact your AI uses arrives from one of three places. Most people only ever use the worst one.</p>
+
+    <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Three layers where knowledge can live: prompt, project knowledge, live connector">
+      <!-- L1 -->
+      <g>
+        <rect x="30" y="60" width="260" height="200" rx="14" fill="#fff" stroke="#d64545" stroke-width="2"/>
+        <circle cx="70" cy="100" r="20" fill="#fdecec"/>
+        <text x="70" y="107" fill="#d64545" font-size="17" font-weight="800" text-anchor="middle">01</text>
+        <text x="102" y="98" fill="#1b2430" font-size="16" font-weight="800">In the prompt</text>
+        <text x="102" y="116" fill="#8a9bb0" font-size="11.5" font-weight="700">PASTE IT EVERY TIME</text>
+        <text x="52" y="150" fill="#5b6472" font-size="12.5">Accurate, but exhausting.</text>
+        <text x="52" y="170" fill="#5b6472" font-size="12.5">Dies with the conversation.</text>
+        <text x="52" y="190" fill="#5b6472" font-size="12.5">Fine for genuine one-offs.</text>
+        <rect x="52" y="208" width="216" height="34" rx="8" fill="#fdecec"/>
+        <text x="160" y="223" fill="#9b2c2c" font-size="11.5" font-weight="800" text-anchor="middle">SCALES TO</text>
+        <text x="160" y="237" fill="#9b2c2c" font-size="11.5" font-weight="800" text-anchor="middle">one conversation</text>
+      </g>
+      <!-- L2 -->
+      <g>
+        <rect x="320" y="60" width="260" height="200" rx="14" fill="#fff" stroke="#e8a63d" stroke-width="2"/>
+        <circle cx="360" cy="100" r="20" fill="#fdf3e1"/>
+        <text x="360" y="107" fill="#c9822a" font-size="17" font-weight="800" text-anchor="middle">02</text>
+        <text x="392" y="98" fill="#1b2430" font-size="16" font-weight="800">In project knowledge</text>
+        <text x="392" y="116" fill="#8a9bb0" font-size="11.5" font-weight="700">UPLOAD ONCE</text>
+        <text x="342" y="150" fill="#5b6472" font-size="12.5">Read across every conversation.</text>
+        <text x="342" y="170" fill="#5b6472" font-size="12.5">Persistent, versionable, reviewable.</text>
+        <text x="342" y="190" fill="#5b6472" font-size="12.5">This is your foundation.</text>
+        <rect x="342" y="208" width="216" height="34" rx="8" fill="#fdf3e1"/>
+        <text x="450" y="223" fill="#a76c1c" font-size="11.5" font-weight="800" text-anchor="middle">SCALES TO</text>
+        <text x="450" y="237" fill="#a76c1c" font-size="11.5" font-weight="800" text-anchor="middle">every conversation</text>
+      </g>
+      <!-- L3 -->
+      <g>
+        <rect x="610" y="60" width="260" height="200" rx="14" fill="#fff" stroke="#2e9e52" stroke-width="3"/>
+        <circle cx="650" cy="100" r="20" fill="#eaf8ee"/>
+        <text x="650" y="107" fill="#2e9e52" font-size="17" font-weight="800" text-anchor="middle">03</text>
+        <text x="682" y="98" fill="#1b2430" font-size="16" font-weight="800">In a live connector</text>
+        <text x="682" y="116" fill="#8a9bb0" font-size="11.5" font-weight="700">MCP · PULLS ON ASK</text>
+        <text x="632" y="150" fill="#5b6472" font-size="12.5">Current at the moment of asking.</text>
+        <text x="632" y="170" fill="#5b6472" font-size="12.5">No upload step. Permission-aware.</text>
+        <text x="632" y="190" fill="#5b6472" font-size="12.5">This is where the leverage is.</text>
+        <rect x="632" y="208" width="216" height="34" rx="8" fill="#eaf8ee"/>
+        <text x="740" y="223" fill="#1d6b38" font-size="11.5" font-weight="800" text-anchor="middle">SCALES TO</text>
+        <text x="740" y="237" fill="#1d6b38" font-size="11.5" font-weight="800" text-anchor="middle">every conversation, always fresh</text>
+      </g>
+
+      <text x="450" y="34" fill="#0c2d5e" font-size="13.5" font-weight="800" text-anchor="middle">
+        EFFORT PER USE  ↓ decreasing        ·        FRESHNESS  ↑ increasing</text>
+      <text x="450" y="292" fill="#5b6472" font-size="12.5" text-anchor="middle" font-style="italic">
+        Session 3 builds layer 2 and wires exactly one of layer 3.</text>
+    </svg>
+  </div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 7 · Quality Test</div>
+    <h3>Four Properties of a Base That Actually Works</h3>
+    <p class="lead">Dumping files in a folder is not a knowledge layer. These four properties separate
+       a useful base from an expensive pile.</p>
+
+    <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Four properties: structured, opinionated, fresh, scoped">
+      <g>
+        <rect x="20" y="30" width="205" height="160" rx="13" fill="#eaf2fb" stroke="#2d6cad" stroke-width="2"/>
+        <text x="122" y="62" fill="#2d6cad" font-size="14" font-weight="800" text-anchor="middle">STRUCTURED</text>
+        <line x1="50" y1="76" x2="195" y2="76" stroke="#2d6cad" stroke-width="1" opacity=".3"/>
+        <text x="122" y="98" fill="#1b2430" font-size="12.5" text-anchor="middle">Headed sections,</text>
+        <text x="122" y="116" fill="#1b2430" font-size="12.5" text-anchor="middle">not a wall of prose.</text>
+        <text x="122" y="146" fill="#5b6472" font-size="11.5" text-anchor="middle">Retrieval works on chunks.</text>
+        <text x="122" y="163" fill="#5b6472" font-size="11.5" text-anchor="middle">Clear headings = right chunk.</text>
+      </g>
+      <g>
+        <rect x="245" y="30" width="205" height="160" rx="13" fill="#eaf8ee" stroke="#2e9e52" stroke-width="2"/>
+        <text x="347" y="62" fill="#2e9e52" font-size="14" font-weight="800" text-anchor="middle">OPINIONATED</text>
+        <line x1="275" y1="76" x2="420" y2="76" stroke="#2e9e52" stroke-width="1" opacity=".3"/>
+        <text x="347" y="98" fill="#1b2430" font-size="12.5" text-anchor="middle">States what good is</text>
+        <text x="347" y="116" fill="#1b2430" font-size="12.5" text-anchor="middle">and what to avoid.</text>
+        <text x="347" y="146" fill="#5b6472" font-size="11.5" text-anchor="middle">Neutral reference gives</text>
+        <text x="347" y="163" fill="#5b6472" font-size="11.5" text-anchor="middle">neutral output.</text>
+      </g>
+      <g>
+        <rect x="470" y="30" width="205" height="160" rx="13" fill="#fdf3e1" stroke="#e8a63d" stroke-width="2"/>
+        <text x="572" y="62" fill="#c9822a" font-size="14" font-weight="800" text-anchor="middle">FRESH</text>
+        <line x1="500" y1="76" x2="645" y2="76" stroke="#e8a63d" stroke-width="1" opacity=".3"/>
+        <text x="572" y="98" fill="#1b2430" font-size="12.5" text-anchor="middle">Every section carries a</text>
+        <text x="572" y="116" fill="#1b2430" font-size="12.5" text-anchor="middle">last-reviewed date.</text>
+        <text x="572" y="146" fill="#5b6472" font-size="11.5" text-anchor="middle">A confidently stale answer</text>
+        <text x="572" y="163" fill="#5b6472" font-size="11.5" text-anchor="middle">is worse than none.</text>
+      </g>
+      <g>
+        <rect x="695" y="30" width="185" height="160" rx="13" fill="#f0ebfa" stroke="#7c5cbf" stroke-width="2"/>
+        <text x="787" y="62" fill="#7c5cbf" font-size="14" font-weight="800" text-anchor="middle">SCOPED</text>
+        <line x1="720" y1="76" x2="855" y2="76" stroke="#7c5cbf" stroke-width="1" opacity=".3"/>
+        <text x="787" y="98" fill="#1b2430" font-size="12.5" text-anchor="middle">Only what this</text>
+        <text x="787" y="116" fill="#1b2430" font-size="12.5" text-anchor="middle">project needs.</text>
+        <text x="787" y="146" fill="#5b6472" font-size="11.5" text-anchor="middle">Irrelevant material</text>
+        <text x="787" y="163" fill="#5b6472" font-size="11.5" text-anchor="middle">dilutes retrieval.</text>
+      </g>
+    </svg>
+    <div class="callout bad">
+      <b>Most common S3 failure:</b> "answers got longer but not better." Cause — the base is reference material
+      with no opinions in it. Fix — add the "what good looks like" and "what we never do" sections.
+      Standards change output; facts only pad it.
+    </div>
+  </div>
+</section>
+
+<!-- ============ MCP ============ -->
+<section id="mcp">
+  <div class="section-head"><h2>🔌 How MCP Actually Works</h2></div>
+  <div class="section-sub">The diagram that stops MCP feeling like magic</div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 8 · Connector Architecture</div>
+    <h3>Model Context Protocol, End to End</h3>
+    <p class="lead">MCP is a standard plug. Claude speaks one protocol; every tool that implements it becomes readable.
+       Permissions live at the connector, not the model — which is why scope is the fix for 9 of 10 failures.</p>
+
+    <svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="MCP architecture: user to Claude to MCP layer to external systems">
+      <!-- user -->
+      <rect x="30" y="150" width="120" height="70" rx="12" fill="#0c2d5e"/>
+      <text x="90" y="180" fill="#fff" font-size="14" font-weight="800" text-anchor="middle">YOU</text>
+      <text x="90" y="199" fill="#9db3d6" font-size="11" text-anchor="middle">ask a question</text>
+
+      <path d="M 156 185 L 202 185" stroke="#2d6cad" stroke-width="3"/>
+      <path d="M 210 185 l -10 -6 l 0 12 z" fill="#2d6cad"/>
+
+      <!-- claude -->
+      <rect x="218" y="130" width="150" height="110" rx="14" fill="#D97757"/>
+      <path d="M262 205 L 285 160 h13 l23 45 h-12 l-3.6 -8 h-16.8 l-3.6 8 z
+               M280 189 h11 l-5.5 -13 z" fill="#fff"/>
+      <text x="293" y="228" fill="#fff" font-size="13" font-weight="800" text-anchor="middle">CLAUDE</text>
+
+      <path d="M 374 185 L 420 185" stroke="#2d6cad" stroke-width="3"/>
+      <path d="M 428 185 l -10 -6 l 0 12 z" fill="#2d6cad"/>
+
+      <!-- MCP layer -->
+      <rect x="436" y="110" width="140" height="150" rx="14" fill="#1b2430"/>
+      <text x="506" y="140" fill="#fff" font-size="14" font-weight="800" text-anchor="middle">MCP LAYER</text>
+      <circle cx="506" cy="180" r="14" fill="#fff"/>
+      <circle cx="478" cy="162" r="6" fill="#8A9BB0"/>
+      <circle cx="534" cy="162" r="6" fill="#8A9BB0"/>
+      <circle cx="478" cy="198" r="6" fill="#8A9BB0"/>
+      <circle cx="534" cy="198" r="6" fill="#8A9BB0"/>
+      <path d="M496 173 L484 166 M516 173 L528 166 M496 187 L484 194 M516 187 L528 194"
+            stroke="#fff" stroke-width="1.6" opacity=".8"/>
+      <rect x="452" y="222" width="108" height="26" rx="6" fill="#2e9e52"/>
+      <text x="506" y="239" fill="#fff" font-size="10.5" font-weight="800" text-anchor="middle">SCOPE CHECK</text>
+
+      <!-- external systems -->
+      <path d="M 582 155 L 640 100" stroke="#8a9bb0" stroke-width="2"/>
+      <path d="M 646 96 l -3 11 l 9 -6 z" fill="#8a9bb0"/>
+      <path d="M 582 185 L 640 185" stroke="#8a9bb0" stroke-width="2"/>
+      <path d="M 648 185 l -9 -5 l 0 10 z" fill="#8a9bb0"/>
+      <path d="M 582 215 L 640 270" stroke="#8a9bb0" stroke-width="2"/>
+      <path d="M 646 274 l -6 -9 l -3 11 z" fill="#8a9bb0"/>
+
+      <rect x="654" y="70" width="216" height="56" rx="10" fill="#fff" stroke="#dfe4ea" stroke-width="2"/>
+      <text x="676" y="94" fill="#1b2430" font-size="13" font-weight="800">Google Drive / Docs</text>
+      <text x="676" y="112" fill="#8a9bb0" font-size="11">live requisitions, status docs</text>
+
+      <rect x="654" y="157" width="216" height="56" rx="10" fill="#fff" stroke="#dfe4ea" stroke-width="2"/>
+      <text x="676" y="181" fill="#1b2430" font-size="13" font-weight="800">Slack</text>
+      <text x="676" y="199" fill="#8a9bb0" font-size="11">channels, threads, decisions</text>
+
+      <rect x="654" y="244" width="216" height="56" rx="10" fill="#fff" stroke="#dfe4ea" stroke-width="2"/>
+      <text x="676" y="268" fill="#1b2430" font-size="13" font-weight="800">Notion / ATS / Tracker</text>
+      <text x="676" y="286" fill="#8a9bb0" font-size="11">your system of record</text>
+
+      <!-- return path -->
+      <path d="M 654 320 L 300 320 L 300 250" stroke="#2e9e52" stroke-width="2.5"
+            fill="none" stroke-dasharray="6 4"/>
+      <path d="M 300 242 l -5 10 l 10 0 z" fill="#2e9e52"/>
+      <text x="480" y="340" fill="#2e9e52" font-size="12" font-weight="700" text-anchor="middle">
+        current data returns → answer is grounded, not guessed</text>
+
+      <text x="450" y="24" fill="#0c2d5e" font-size="13" font-weight="800" text-anchor="middle">
+        ONE PROTOCOL · MANY SYSTEMS · PERMISSION ENFORCED AT THE CONNECTOR</text>
+    </svg>
+
+    <div class="callout">
+      <b>Teach this line:</b> "The model never gets your password. It asks the connector, the connector checks
+      what you allowed, and only permitted data comes back." That sentence resolves most security objections
+      before they're raised.
+    </div>
+  </div>
+</section>
+
+<!-- ============ PIPELINES ============ -->
+<section id="pipelines">
+  <div class="section-head"><h2>⚙️ Session 4 — Sub-Agents &amp; Pipelines</h2></div>
+  <div class="section-sub">One agent per job. The handoff is where it breaks.</div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 9 · Multi-Agent Patterns</div>
+    <h3>Three Ways to Split a Job</h3>
+    <p class="lead">Ask one agent to research, analyse, write and check, and it silently trades quality between them.</p>
+
+    <svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Pipeline, supervisor and debate multi-agent patterns">
+      <!-- Pipeline -->
+      <text x="150" y="28" fill="#2e9e52" font-size="13" font-weight="800" text-anchor="middle">PIPELINE — build this today</text>
+      <g>
+        <rect x="40" y="46" width="62" height="46" rx="9" fill="#2e9e52"/>
+        <text x="71" y="74" fill="#fff" font-size="13" font-weight="800" text-anchor="middle">A</text>
+        <path d="M 108 69 L 128 69" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 134 69 l -8 -5 l 0 10 z" fill="#5b6472"/>
+        <rect x="138" y="46" width="62" height="46" rx="9" fill="#2e9e52"/>
+        <text x="169" y="74" fill="#fff" font-size="13" font-weight="800" text-anchor="middle">B</text>
+        <path d="M 206 69 L 226 69" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 232 69 l -8 -5 l 0 10 z" fill="#5b6472"/>
+        <rect x="236" y="46" width="62" height="46" rx="9" fill="#2e9e52"/>
+        <text x="267" y="74" fill="#fff" font-size="13" font-weight="800" text-anchor="middle">C</text>
+      </g>
+      <text x="169" y="115" fill="#5b6472" font-size="11.5" text-anchor="middle">Each output feeds the next.</text>
+      <text x="169" y="132" fill="#5b6472" font-size="11.5" text-anchor="middle">Best when work has a natural order.</text>
+
+      <!-- Supervisor -->
+      <text x="470" y="28" fill="#7c5cbf" font-size="13" font-weight="800" text-anchor="middle">SUPERVISOR — the 2026 default</text>
+      <g>
+        <rect x="435" y="40" width="72" height="40" rx="9" fill="#7c5cbf"/>
+        <text x="471" y="65" fill="#fff" font-size="11.5" font-weight="800" text-anchor="middle">COORD</text>
+        <path d="M 452 84 L 410 106" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 404 109 l 10 -1 l -4 -8 z" fill="#5b6472"/>
+        <path d="M 471 84 L 471 104" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 471 110 l -5 -9 l 10 0 z" fill="#5b6472"/>
+        <path d="M 490 84 L 532 106" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 538 109 l -6 -9 l -4 8 z" fill="#5b6472"/>
+        <rect x="374" y="112" width="60" height="40" rx="9" fill="#a78ede"/>
+        <text x="404" y="137" fill="#fff" font-size="12" font-weight="800" text-anchor="middle">S1</text>
+        <rect x="441" y="112" width="60" height="40" rx="9" fill="#a78ede"/>
+        <text x="471" y="137" fill="#fff" font-size="12" font-weight="800" text-anchor="middle">S2</text>
+        <rect x="508" y="112" width="60" height="40" rx="9" fill="#a78ede"/>
+        <text x="538" y="137" fill="#fff" font-size="12" font-weight="800" text-anchor="middle">S3</text>
+      </g>
+      <text x="471" y="174" fill="#5b6472" font-size="11.5" text-anchor="middle">Coordinator delegates, then assembles.</text>
+      <text x="471" y="191" fill="#5b6472" font-size="11.5" text-anchor="middle">Use for anything non-linear.</text>
+
+      <!-- Debate -->
+      <text x="770" y="28" fill="#e8a63d" font-size="13" font-weight="800" text-anchor="middle">DEBATE — high stakes only</text>
+      <g>
+        <rect x="676" y="46" width="66" height="40" rx="9" fill="#e8a63d"/>
+        <text x="709" y="71" fill="#fff" font-size="11.5" font-weight="800" text-anchor="middle">FOR</text>
+        <rect x="798" y="46" width="66" height="40" rx="9" fill="#e8a63d"/>
+        <text x="831" y="71" fill="#fff" font-size="11.5" font-weight="800" text-anchor="middle">AGAINST</text>
+        <path d="M 748 66 L 792 66" stroke="#d64545" stroke-width="2" stroke-dasharray="4 3"/>
+        <path d="M 742 66 l 8 -5 l 0 10 z" fill="#d64545"/>
+        <path d="M 798 66 l -8 -5 l 0 10 z" fill="#d64545"/>
+        <path d="M 709 90 L 755 108" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 761 111 l -6 -9 l -4 8 z" fill="#5b6472"/>
+        <path d="M 831 90 L 785 108" stroke="#5b6472" stroke-width="2"/>
+        <path d="M 779 111 l 10 -1 l -4 -8 z" fill="#5b6472"/>
+        <rect x="735" y="114" width="70" height="40" rx="9" fill="#0c2d5e"/>
+        <text x="770" y="139" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">JUDGE</text>
+      </g>
+      <text x="770" y="174" fill="#5b6472" font-size="11.5" text-anchor="middle">Two argue, a third adjudicates.</text>
+      <text x="770" y="191" fill="#5b6472" font-size="11.5" text-anchor="middle">Expensive. Excellent for judgement calls.</text>
+
+      <line x1="330" y1="40" x2="330" y2="200" stroke="#dfe4ea" stroke-width="1.5"/>
+      <line x1="620" y1="40" x2="620" y2="200" stroke="#dfe4ea" stroke-width="1.5"/>
+
+      <text x="450" y="232" fill="#0c2d5e" font-size="12.5" font-weight="700" text-anchor="middle">
+        Three stages is usually the ceiling. Merge any two that never vary independently.</text>
+    </svg>
+  </div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 10 · The Handoff Contract</div>
+    <h3>Pipelines Fail in the Gap, Not in the Stage</h3>
+    <p class="lead">Nobody defines what crosses between stages — so stage B interprets, and ambiguity gets
+       baked into the middle of your system.</p>
+
+    <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Handoff contract with four properties between two pipeline stages">
+      <rect x="40" y="90" width="170" height="110" rx="13" fill="#7c5cbf"/>
+      <text x="125" y="128" fill="#fff" font-size="15" font-weight="800" text-anchor="middle">STAGE A</text>
+      <text x="125" y="150" fill="#e5dcf7" font-size="12" text-anchor="middle">gathers only</text>
+      <text x="125" y="172" fill="#e5dcf7" font-size="12" text-anchor="middle">makes no judgement</text>
+
+      <rect x="690" y="90" width="170" height="110" rx="13" fill="#7c5cbf"/>
+      <text x="775" y="128" fill="#fff" font-size="15" font-weight="800" text-anchor="middle">STAGE B</text>
+      <text x="775" y="150" fill="#e5dcf7" font-size="12" text-anchor="middle">judges only</text>
+      <text x="775" y="172" fill="#e5dcf7" font-size="12" text-anchor="middle">gathers nothing new</text>
+
+      <!-- the gap -->
+      <rect x="238" y="60" width="424" height="172" rx="14" fill="#fdf3e1"
+            stroke="#e8a63d" stroke-width="2.5" stroke-dasharray="8 5"/>
+      <text x="450" y="86" fill="#a76c1c" font-size="13" font-weight="800" text-anchor="middle">
+        ⚠ THE HANDOFF — WHERE PIPELINES ACTUALLY BREAK</text>
+
+      <g font-size="11.5">
+        <rect x="256" y="98" width="192" height="58" rx="9" fill="#fff" stroke="#e8a63d"/>
+        <text x="270" y="118" fill="#1b2430" font-size="12.5" font-weight="800">CONTRACT</text>
+        <text x="270" y="136" fill="#5b6472">The exact structure A must</text>
+        <text x="270" y="150" fill="#5b6472">produce for B.</text>
+
+        <rect x="458" y="98" width="188" height="58" rx="9" fill="#fff" stroke="#e8a63d"/>
+        <text x="472" y="118" fill="#1b2430" font-size="12.5" font-weight="800">COMPLETENESS</text>
+        <text x="472" y="136" fill="#5b6472">What B does when a field</text>
+        <text x="472" y="150" fill="#5b6472">is missing.</text>
+
+        <rect x="256" y="164" width="192" height="58" rx="9" fill="#fff" stroke="#e8a63d"/>
+        <text x="270" y="184" fill="#1b2430" font-size="12.5" font-weight="800">PROVENANCE</text>
+        <text x="270" y="202" fill="#5b6472">Each stage carries its</text>
+        <text x="270" y="216" fill="#5b6472">sources forward.</text>
+
+        <rect x="458" y="164" width="188" height="58" rx="9" fill="#fff" stroke="#e8a63d"/>
+        <text x="472" y="184" fill="#1b2430" font-size="12.5" font-weight="800">STOP CONDITION</text>
+        <text x="472" y="202" fill="#5b6472">When a stage refuses to</text>
+        <text x="472" y="216" fill="#5b6472">pass anything on.</text>
+      </g>
+
+      <path d="M 216 145 L 234 145" stroke="#7c5cbf" stroke-width="3"/>
+      <path d="M 240 145 l -9 -5 l 0 10 z" fill="#7c5cbf"/>
+      <path d="M 666 145 L 684 145" stroke="#7c5cbf" stroke-width="3"/>
+      <path d="M 690 145 l -9 -5 l 0 10 z" fill="#7c5cbf"/>
+
+      <text x="450" y="262" fill="#d64545" font-size="12.5" font-weight="700" text-anchor="middle">
+        A pipeline that always produces output will happily produce confident garbage.</text>
+      <text x="450" y="282" fill="#5b6472" font-size="12" text-anchor="middle" font-style="italic">
+        Every stage needs a stop condition that can actually fire.</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ TRIGGERS ============ -->
+<section id="triggers">
+  <div class="section-head"><h2>⏱ Session 5 — Triggers: Who Presses Run?</h2></div>
+  <div class="section-sub">Everything you have built still waits for you. This is where you hand over the start button.</div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 11 · Trigger Types</div>
+    <h3>Three Ways Work Starts — and the Exception Path</h3>
+    <p class="lead">The exception rule is the part people skip. An automation with no path back to a human
+       is not autonomy, it's abdication.</p>
+
+    <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Manual, scheduled and event triggers with exception path to human">
+      <!-- three trigger types -->
+      <g>
+        <rect x="30" y="50" width="200" height="86" rx="12" fill="#fff" stroke="#8a9bb0" stroke-width="2"/>
+        <circle cx="66" cy="82" r="16" fill="#eef1f5"/>
+        <text x="66" y="88" font-size="15" text-anchor="middle">👆</text>
+        <text x="92" y="80" fill="#1b2430" font-size="14" font-weight="800">MANUAL</text>
+        <text x="92" y="98" fill="#8a9bb0" font-size="11.5">you press run</text>
+        <text x="50" y="124" fill="#5b6472" font-size="11.5">Where you are today. Fine — but</text>
+        <text x="50" y="138" fill="#5b6472" font-size="11.5" opacity="0">spacer</text>
+      </g>
+      <g>
+        <rect x="30" y="146" width="200" height="86" rx="12" fill="#fdf3e1" stroke="#e8a63d" stroke-width="2"/>
+        <circle cx="66" cy="178" r="16" fill="#fff"/>
+        <text x="66" y="184" font-size="15" text-anchor="middle">🕐</text>
+        <text x="92" y="176" fill="#1b2430" font-size="14" font-weight="800">SCHEDULED</text>
+        <text x="92" y="194" fill="#a76c1c" font-size="11.5">time-based · cron</text>
+        <text x="50" y="220" fill="#5b6472" font-size="11.5">"Every Monday 8am, run the status."</text>
+      </g>
+      <g>
+        <rect x="30" y="242" width="200" height="86" rx="12" fill="#eaf8ee" stroke="#2e9e52" stroke-width="2"/>
+        <circle cx="66" cy="274" r="16" fill="#fff"/>
+        <text x="66" y="280" font-size="15" text-anchor="middle">⚡</text>
+        <text x="92" y="272" fill="#1b2430" font-size="14" font-weight="800">EVENT</text>
+        <text x="92" y="290" fill="#1d6b38" font-size="11.5">signal-based</text>
+        <text x="50" y="316" fill="#5b6472" font-size="11.5">"When a CV lands in the folder, screen it."</text>
+      </g>
+
+      <path d="M 238 90 L 300 170" stroke="#8a9bb0" stroke-width="2"/>
+      <path d="M 304 176 l -2 -11 l -8 6 z" fill="#8a9bb0"/>
+      <path d="M 238 188 L 300 188" stroke="#e8a63d" stroke-width="2.5"/>
+      <path d="M 306 188 l -9 -5 l 0 10 z" fill="#e8a63d"/>
+      <path d="M 238 284 L 300 202" stroke="#2e9e52" stroke-width="2.5"/>
+      <path d="M 304 196 l -10 5 l 8 6 z" fill="#2e9e52"/>
+
+      <!-- pipeline -->
+      <rect x="312" y="140" width="230" height="96" rx="13" fill="#7c5cbf"/>
+      <text x="427" y="176" fill="#fff" font-size="15" font-weight="800" text-anchor="middle">YOUR PIPELINE</text>
+      <text x="427" y="198" fill="#e5dcf7" font-size="12" text-anchor="middle">S4's specialists, in order</text>
+      <text x="427" y="218" fill="#e5dcf7" font-size="12" text-anchor="middle">knowledge layer attached</text>
+
+      <!-- decision diamond -->
+      <path d="M 620 188 L 676 148 L 732 188 L 676 228 z" fill="#0c2d5e"/>
+      <text x="676" y="182" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">EXCEPTION</text>
+      <text x="676" y="198" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">RULE?</text>
+
+      <path d="M 548 188 L 614 188" stroke="#7c5cbf" stroke-width="3"/>
+      <path d="M 620 188 l -9 -5 l 0 10 z" fill="#7c5cbf"/>
+
+      <!-- outcomes -->
+      <path d="M 676 142 L 676 96" stroke="#d64545" stroke-width="2.5"/>
+      <path d="M 676 90 l -5 10 l 10 0 z" fill="#d64545"/>
+      <rect x="580" y="42" width="192" height="48" rx="10" fill="#fdecec" stroke="#d64545" stroke-width="2"/>
+      <text x="676" y="62" fill="#9b2c2c" font-size="12.5" font-weight="800" text-anchor="middle">STOP · ASK A HUMAN</text>
+      <text x="676" y="80" fill="#9b2c2c" font-size="11" text-anchor="middle">threshold breached / data missing</text>
+
+      <path d="M 738 188 L 790 188" stroke="#2e9e52" stroke-width="2.5"/>
+      <path d="M 796 188 l -9 -5 l 0 10 z" fill="#2e9e52"/>
+      <rect x="802" y="160" width="76" height="56" rx="10" fill="#eaf8ee" stroke="#2e9e52" stroke-width="2"/>
+      <text x="840" y="184" fill="#1d6b38" font-size="12" font-weight="800" text-anchor="middle">SHIP</text>
+      <text x="840" y="202" fill="#1d6b38" font-size="10.5" text-anchor="middle">it runs</text>
+
+      <text x="450" y="24" fill="#0c2d5e" font-size="13" font-weight="800" text-anchor="middle">
+        HANDING OVER THE START BUTTON — WITH A WAY TO HAND IT BACK</text>
+    </svg>
+    <div class="callout">
+      <b>Session 5 deliverable:</b> one schedule-based automation, one event-based trigger, and a
+      <b>written exception rule</b> that says exactly when the system must stop and ask.
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACK HEALTH ============ -->
+<section id="health">
+  <div class="section-head"><h2>🩺 Session 6 — Stack Health</h2></div>
+  <div class="section-sub">Narrow scope is cheaper and safer</div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 12 · The Audit Decision</div>
+    <h3>Keep · Narrow · Cut</h3>
+    <p class="lead">Five sessions in, your stack has real dependencies. Every connector is a door you left open —
+       audit each one against what it actually earns you.</p>
+
+    <svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Connector audit decision matrix: keep, narrow, cut">
+      <line x1="120" y1="220" x2="820" y2="220" stroke="#5b6472" stroke-width="2"/>
+      <line x1="120" y1="40" x2="120" y2="220" stroke="#5b6472" stroke-width="2"/>
+      <text x="470" y="248" fill="#1b2430" font-size="12.5" font-weight="800" text-anchor="middle">
+        HOW OFTEN IT'S ACTUALLY USED →</text>
+      <text x="88" y="130" fill="#1b2430" font-size="12.5" font-weight="800"
+            transform="rotate(-90 88 130)" text-anchor="middle">PERMISSION BREADTH →</text>
+
+      <!-- quadrants -->
+      <rect x="122" y="42" width="348" height="88" fill="#fdecec"/>
+      <text x="296" y="76" fill="#9b2c2c" font-size="15" font-weight="800" text-anchor="middle">CUT IT</text>
+      <text x="296" y="98" fill="#9b2c2c" font-size="11.5" text-anchor="middle">Broad access, barely used.</text>
+      <text x="296" y="115" fill="#9b2c2c" font-size="11.5" text-anchor="middle">Pure risk with no return.</text>
+
+      <rect x="472" y="42" width="348" height="88" fill="#fdf3e1"/>
+      <text x="646" y="76" fill="#a76c1c" font-size="15" font-weight="800" text-anchor="middle">NARROW IT</text>
+      <text x="646" y="98" fill="#a76c1c" font-size="11.5" text-anchor="middle">You need it — but not this much of it.</text>
+      <text x="646" y="115" fill="#a76c1c" font-size="11.5" text-anchor="middle">Cut scope to read-only, one folder.</text>
+
+      <rect x="122" y="132" width="348" height="86" fill="#eef1f5"/>
+      <text x="296" y="166" fill="#5b6472" font-size="15" font-weight="800" text-anchor="middle">REVIEW LATER</text>
+      <text x="296" y="188" fill="#5b6472" font-size="11.5" text-anchor="middle">Tight scope, rarely used.</text>
+      <text x="296" y="205" fill="#5b6472" font-size="11.5" text-anchor="middle">Low risk — revisit next quarter.</text>
+
+      <rect x="472" y="132" width="348" height="86" fill="#eaf8ee"/>
+      <text x="646" y="166" fill="#1d6b38" font-size="15" font-weight="800" text-anchor="middle">KEEP IT</text>
+      <text x="646" y="188" fill="#1d6b38" font-size="11.5" text-anchor="middle">Tight scope, high use.</text>
+      <text x="646" y="205" fill="#1d6b38" font-size="11.5" text-anchor="middle">This is what a healthy stack looks like.</text>
+
+      <line x1="470" y1="42" x2="470" y2="218" stroke="#fff" stroke-width="3"/>
+      <line x1="122" y1="130" x2="818" y2="130" stroke="#fff" stroke-width="3"/>
+
+      <text x="470" y="24" fill="#0c2d5e" font-size="13" font-weight="800" text-anchor="middle">
+        RUN THIS FOR EVERY CONNECTOR — THEN SET A QUARTERLY REMINDER</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ GUARDRAILS ============ -->
+<section id="guardrails">
+  <div class="section-head"><h2>🛡 Session 7 — Guardrails</h2></div>
+  <div class="section-sub">Speed without control destroys trust</div>
+
+  <div class="fig">
+    <div class="fig-title">Figure 13 · Three Layers of Control</div>
+    <h3>Where a Guardrail Can Live</h3>
+    <p class="lead">You now have a system that reads real data, makes judgements, and acts without you.
+       Control has to exist at three different points — one layer alone is not enough.</p>
+
+    <svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Guardrails at instruction, context and output layers with human gate">
+      <!-- concentric containment -->
+      <rect x="40" y="40" width="500" height="250" rx="16" fill="#fdecec" stroke="#d64545" stroke-width="2"/>
+      <text x="60" y="66" fill="#d64545" font-size="12" font-weight="800">LAYER 1 · INSTRUCTION GUARDRAILS</text>
+      <text x="60" y="86" fill="#5b6472" font-size="11.5">What it may never be asked to do. Written into the system instruction.</text>
+
+      <rect x="66" y="100" width="448" height="172" rx="14" fill="#fdf3e1" stroke="#e8a63d" stroke-width="2"/>
+      <text x="86" y="126" fill="#a76c1c" font-size="12" font-weight="800">LAYER 2 · CONTEXT GUARDRAILS</text>
+      <text x="86" y="146" fill="#5b6472" font-size="11.5">What data it may reach. Connector scope, read-only, folder limits.</text>
+
+      <rect x="92" y="160" width="396" height="96" rx="12" fill="#eaf8ee" stroke="#2e9e52" stroke-width="2"/>
+      <text x="112" y="186" fill="#1d6b38" font-size="12" font-weight="800">LAYER 3 · OUTPUT GUARDRAILS</text>
+      <text x="112" y="206" fill="#5b6472" font-size="11.5">What may leave the system. Review gates, banned claims,</text>
+      <text x="112" y="222" fill="#5b6472" font-size="11.5">mandatory citations, human sign-off before anything sends.</text>
+      <rect x="112" y="230" width="356" height="18" rx="5" fill="#fff"/>
+      <text x="290" y="243" fill="#1d6b38" font-size="10.5" font-weight="800" text-anchor="middle">
+        ⬅ the only layer the outside world ever sees</text>
+
+      <!-- human gate -->
+      <path d="M 548 165 L 596 165" stroke="#0c2d5e" stroke-width="3"/>
+      <path d="M 604 165 l -10 -6 l 0 12 z" fill="#0c2d5e"/>
+      <rect x="612" y="118" width="120" height="94" rx="13" fill="#0c2d5e"/>
+      <text x="672" y="152" font-size="20" text-anchor="middle">🧑</text>
+      <text x="672" y="176" fill="#fff" font-size="12.5" font-weight="800" text-anchor="middle">HUMAN GATE</text>
+      <text x="672" y="194" fill="#9db3d6" font-size="10.5" text-anchor="middle">approves or blocks</text>
+
+      <path d="M 740 165 L 786 165" stroke="#2e9e52" stroke-width="3"/>
+      <path d="M 794 165 l -10 -6 l 0 12 z" fill="#2e9e52"/>
+      <rect x="800" y="138" width="76" height="54" rx="11" fill="#eaf8ee" stroke="#2e9e52" stroke-width="2"/>
+      <text x="838" y="162" fill="#1d6b38" font-size="12" font-weight="800" text-anchor="middle">SHIPS</text>
+      <text x="838" y="180" fill="#1d6b38" font-size="10" text-anchor="middle">to the world</text>
+
+      <text x="450" y="24" fill="#0c2d5e" font-size="13" font-weight="800" text-anchor="middle">
+        DEFENCE IN DEPTH — EACH LAYER CATCHES WHAT THE LAST ONE MISSED</text>
+      <text x="450" y="312" fill="#5b6472" font-size="12.5" text-anchor="middle" font-style="italic">
+        Session 7 exercise: red-team a colleague's system, then fix what they found in yours.</text>
+    </svg>
+
+    <div class="callout bad">
+      <b>The framing that lands:</b> "Everything before Session 7 made your system faster.
+      Session 7 is the only thing that makes it trustworthy — and trust is what lets you actually deploy it at work."
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Visual Theory Library &nbsp;|&nbsp; Talent Scout AI Marketing-Operator Cohort &nbsp;|&nbsp;
+  Questions in <a href="#" onclick="return false;">#ts-team-cohort</a> &nbsp;|&nbsp; gettalentscout.com/ai-cohort
+  <div style="margin-top:8px;opacity:.7;font-size:11.5px">
+    Product names and logos are trademarks of their respective owners, shown here for identification in an
+    educational context.
+  </div>
+</footer>
+
+<script>
+  var navButtons = document.querySelectorAll('.nav button');
+  navButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var t = document.getElementById(btn.dataset.target);
+      if(t){ t.scrollIntoView({behavior:'smooth', block:'start'}); }
+    });
+  });
+  var sections = document.querySelectorAll('main section');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 100;
+    sections.forEach(function(sec){
+      if(sec.offsetTop <= pos && (sec.offsetTop + sec.offsetHeight) > pos){
+        navButtons.forEach(function(b){ b.classList.remove('active'); });
+        var m = document.querySelector('.nav button[data-target="'+sec.id+'"]');
+        if(m) m.classList.add('active');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
