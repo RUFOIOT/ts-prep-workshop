@@ -195,6 +195,17 @@ h3{font-size:clamp(15px,1.7vw,21px);font-weight:700;color:var(--white);letter-sp
 kbd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
   border-radius:5px;padding:2px 8px;font-family:monospace;font-size:11.5px;color:var(--lblue)}
 
+/* RCTFX vs Stage comparison grid */
+.cmp{display:grid;grid-template-columns:104px 1fr 1fr;border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;overflow:hidden;font-size:11.5px}
+.cmp>div{padding:8px 11px;border-bottom:1px solid rgba(255,255,255,.055);line-height:1.4}
+.cmp>div:nth-child(3n+1){background:rgba(255,255,255,.04);color:var(--dim);font-weight:800;
+  font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;display:flex;align-items:center}
+.cmp>div:nth-child(3n+2){color:#ffe0a3;background:rgba(255,193,69,.05)}
+.cmp>div:nth-child(3n+3){color:#a8f5d0;background:rgba(0,230,138,.05)}
+.cmp .hd{font-weight:900;letter-spacing:1.5px;font-size:10px;text-transform:uppercase;
+  text-align:center;justify-content:center}
+
 ::-webkit-scrollbar{width:7px;height:7px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:4px}
@@ -557,6 +568,243 @@ If [FAILURE CASE], return [FLAG] and stop.</div>
 <span class="rr">✗</span> "Extract the claims <span class="rr">and</span> score them"
 <span class="g">✓</span> "Extract the claims"  → stage 1
 <span class="g">✓</span> "Score the claims"    → stage 2</div>
+        </div>
+
+        <div class="tipbox" style="margin-top:12px;font-size:12px">
+          <b style="color:var(--white)">Where this goes →</b> you will paste this exact block into the
+          <b>Set project instructions</b> field of one Claude Project per stage. Next slide shows you
+          precisely where.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 6B · RCTFX vs STAGE + DESKTOP SETUP ═══ -->
+<section class="slide" data-notes="THE MOST IMPORTANT SLIDE OF THE SESSION. Do not rush it. Give it 4 minutes.
+
+<b>SAY:</b> 'Session 2 taught you RCTFX. Nothing about it was wrong. But an RCTFX prompt lives in the chat box and dies when you close the tab, and YOU are the thing carrying output from one step to the next. A pipeline stage takes that same RCTFX and moves it somewhere permanent — the project instructions field — then adds two gates so the stage can refuse bad work coming in and refuse to invent work going out.'
+
+<b>THEN:</b> point at the left half of the diagram and say 'this is you being the pipeline'. Point at the right half: 'this is the pipeline being the pipeline'.
+
+<b>THE TEST — make everyone do it live:</b> after they save Stage 2 instructions, open a brand new chat inside that project and type just the word hello. If Claude replies MALFORMED INPUT, the gate is live. If Claude answers helpfully, the instructions did not save — send them back to step 4. This single test catches 90 percent of setup failures in the room.
+
+<b>ASK THE ROOM:</b> 'Who got MALFORMED INPUT?' Hands up. Anyone without a hand up needs help before you move on.">
+  <div class="eyebrow r d1">SESSION 2 → SESSION 4</div>
+  <h2 class="r d1">RCTFX vs. a <span class="grad">Pipeline Stage</span></h2>
+  <p class="sub r d2" style="margin-top:6px">Same six letters. Two completely different places on your desktop.</p>
+  <div class="rule r d2"></div>
+
+  <div class="flex1" style="justify-content:flex-start">
+
+    <!-- ══ BIG COMPARISON DIAGRAM ══ -->
+    <svg viewBox="0 0 1180 248" class="r d3" style="width:100%;height:auto;max-height:31vh">
+      <defs>
+        <linearGradient id="goldf" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="rgba(255,193,69,.22)"/><stop offset="100%" stop-color="rgba(255,193,69,.02)"/>
+        </linearGradient>
+        <linearGradient id="grnf" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="rgba(0,230,138,.20)"/><stop offset="100%" stop-color="rgba(0,230,138,.02)"/>
+        </linearGradient>
+      </defs>
+
+      <line x1="576" y1="8" x2="576" y2="240" stroke="rgba(255,255,255,.14)" stroke-width="1.5" stroke-dasharray="5 7"/>
+
+      <!-- ─── LEFT : RCTFX PROMPT ─── -->
+      <rect x="0" y="0" width="560" height="248" rx="12" fill="url(#goldf)"/>
+      <text x="18" y="26" fill="#FFC145" font-size="11.5" font-weight="900" letter-spacing="2.6">SESSION 2 · AN RCTFX PROMPT</text>
+      <text x="18" y="45" fill="#8A9BB0" font-size="11.5">You are the pipeline. You carry every result to the next step by hand.</text>
+
+      <!-- chat window mock -->
+      <rect x="18" y="60" width="186" height="112" rx="9" fill="#0d1726" stroke="rgba(255,193,69,.4)"/>
+      <line x1="18" y1="82" x2="204" y2="82" stroke="rgba(255,255,255,.1)"/>
+      <circle cx="31" cy="71" r="3.5" fill="#FF5E5E"/><circle cx="42" cy="71" r="3.5" fill="#FFC145"/><circle cx="53" cy="71" r="3.5" fill="#00E68A"/>
+      <text x="66" y="75" fill="#5A6B80" font-size="8.5" font-weight="700">New chat</text>
+      <text x="30" y="99" fill="#B47DFF" font-size="9" font-weight="800">ROLE ·  CONTEXT ·  TASK</text>
+      <text x="30" y="113" fill="#B47DFF" font-size="9" font-weight="800">FORMAT ·  CONSTRAINTS</text>
+      <rect x="30" y="122" width="162" height="20" rx="5" fill="rgba(255,193,69,.12)" stroke="rgba(255,193,69,.3)"/>
+      <text x="38" y="136" fill="#ffe0a3" font-size="8.5" font-weight="700">you paste RCTFX here ▌</text>
+      <text x="30" y="159" fill="#5A6B80" font-size="8.5">one message · one shot</text>
+
+      <path d="M212 116 L 240 116" stroke="#FFC145" stroke-width="2.5"/><path d="M247 116 l -9 -5 l 0 10 z" fill="#FFC145"/>
+
+      <circle cx="284" cy="116" r="27" fill="#111E33" stroke="rgba(255,193,69,.45)" stroke-width="1.5"/>
+      <text x="284" y="113" fill="#fff" font-size="10" font-weight="800" text-anchor="middle">Claude</text>
+      <text x="284" y="126" fill="#5A6B80" font-size="8" text-anchor="middle">generic</text>
+
+      <path d="M314 116 L 342 116" stroke="#FFC145" stroke-width="2.5"/><path d="M349 116 l -9 -5 l 0 10 z" fill="#FFC145"/>
+
+      <rect x="356" y="90" width="122" height="52" rx="8" fill="#111E33" stroke="rgba(255,193,69,.35)"/>
+      <text x="417" y="112" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">ANSWER</text>
+      <text x="417" y="127" fill="#5A6B80" font-size="8.5" text-anchor="middle">unstructured prose</text>
+
+      <!-- human loop -->
+      <path d="M417 144 L 417 178 L 120 178 L 120 176" stroke="#FF5E5E" stroke-width="2" stroke-dasharray="4 4" fill="none"/>
+      <path d="M120 170 l -5 9 l 10 0 z" fill="#FF5E5E"/>
+      <rect x="196" y="184" width="196" height="24" rx="6" fill="rgba(255,94,94,.13)" stroke="rgba(255,94,94,.35)"/>
+      <text x="294" y="200" fill="#ffb3b3" font-size="9.5" font-weight="800" text-anchor="middle">YOU copy · YOU paste · YOU judge</text>
+
+      <rect x="18" y="216" width="460" height="24" rx="6" fill="rgba(255,193,69,.09)" stroke="rgba(255,193,69,.25)"/>
+      <text x="30" y="232" fill="#ffe0a3" font-size="10" font-weight="700">Lives in the chat box  ·  gone the moment you close the tab</text>
+
+      <!-- ─── RIGHT : PIPELINE STAGE ─── -->
+      <rect x="600" y="0" width="580" height="248" rx="12" fill="url(#grnf)"/>
+      <text x="618" y="26" fill="#00E68A" font-size="11.5" font-weight="900" letter-spacing="2.6">SESSION 4 · A PIPELINE STAGE</text>
+      <text x="618" y="45" fill="#8A9BB0" font-size="11.5">The instructions are the pipeline. The gates carry the work, not you.</text>
+
+      <text x="618" y="66" fill="#5A6B80" font-size="8.5" font-weight="800" letter-spacing="1.4">ONE CLAUDE PROJECT EACH  ·  SAME RCTFX INSIDE  ·  PLUS TWO GATES</text>
+
+      <!-- stage cards -->
+      <g>
+        <rect x="618" y="74" width="146" height="112" rx="9" fill="#0d1726" stroke="rgba(0,230,138,.4)"/>
+        <rect x="618" y="74" width="146" height="19" fill="rgba(0,230,138,.16)"/>
+        <text x="691" y="87" fill="#00E68A" font-size="8" font-weight="900" text-anchor="middle">▼ INPUT REQUIREMENT</text>
+        <text x="691" y="112" fill="#fff" font-size="12" font-weight="800" text-anchor="middle">STAGE 1</text>
+        <text x="691" y="127" fill="#8A9BB0" font-size="9.5" text-anchor="middle">the gatherer</text>
+        <text x="691" y="146" fill="#B47DFF" font-size="8.5" font-weight="800" text-anchor="middle">RCTFX inside</text>
+        <text x="691" y="159" fill="#5A6B80" font-size="8" text-anchor="middle">verb: EXTRACT</text>
+        <rect x="618" y="167" width="146" height="19" fill="rgba(255,94,94,.16)"/>
+        <text x="691" y="180" fill="#FF5E5E" font-size="8" font-weight="900" text-anchor="middle">▲ STOP CONDITION</text>
+      </g>
+
+      <path d="M768 130 L 792 130" stroke="#00E68A" stroke-width="2.5"/><path d="M799 130 l -9 -5 l 0 10 z" fill="#00E68A"/>
+      <text x="783" y="120" fill="#00E68A" font-size="7.5" font-weight="800" text-anchor="middle">contract</text>
+
+      <g>
+        <rect x="806" y="74" width="146" height="112" rx="9" fill="#0d1726" stroke="rgba(0,230,138,.4)"/>
+        <rect x="806" y="74" width="146" height="19" fill="rgba(0,230,138,.16)"/>
+        <text x="879" y="87" fill="#00E68A" font-size="8" font-weight="900" text-anchor="middle">▼ INPUT REQUIREMENT</text>
+        <text x="879" y="112" fill="#fff" font-size="12" font-weight="800" text-anchor="middle">STAGE 2</text>
+        <text x="879" y="127" fill="#8A9BB0" font-size="9.5" text-anchor="middle">the judge</text>
+        <text x="879" y="146" fill="#B47DFF" font-size="8.5" font-weight="800" text-anchor="middle">RCTFX inside</text>
+        <text x="879" y="159" fill="#5A6B80" font-size="8" text-anchor="middle">verb: SCORE</text>
+        <rect x="806" y="167" width="146" height="19" fill="rgba(255,94,94,.16)"/>
+        <text x="879" y="180" fill="#FF5E5E" font-size="8" font-weight="900" text-anchor="middle">▲ STOP CONDITION</text>
+      </g>
+
+      <path d="M956 130 L 980 130" stroke="#00E68A" stroke-width="2.5"/><path d="M987 130 l -9 -5 l 0 10 z" fill="#00E68A"/>
+      <text x="971" y="120" fill="#00E68A" font-size="7.5" font-weight="800" text-anchor="middle">contract</text>
+
+      <g>
+        <rect x="994" y="74" width="146" height="112" rx="9" fill="#0d1726" stroke="rgba(0,230,138,.4)"/>
+        <rect x="994" y="74" width="146" height="19" fill="rgba(0,230,138,.16)"/>
+        <text x="1067" y="87" fill="#00E68A" font-size="8" font-weight="900" text-anchor="middle">▼ INPUT REQUIREMENT</text>
+        <text x="1067" y="112" fill="#fff" font-size="12" font-weight="800" text-anchor="middle">STAGE 3</text>
+        <text x="1067" y="127" fill="#8A9BB0" font-size="9.5" text-anchor="middle">the communicator</text>
+        <text x="1067" y="146" fill="#B47DFF" font-size="8.5" font-weight="800" text-anchor="middle">RCTFX inside</text>
+        <text x="1067" y="159" fill="#5A6B80" font-size="8" text-anchor="middle">verb: DRAFT</text>
+        <rect x="994" y="167" width="146" height="19" fill="rgba(255,94,94,.16)"/>
+        <text x="1067" y="180" fill="#FF5E5E" font-size="8" font-weight="900" text-anchor="middle">▲ STOP CONDITION</text>
+      </g>
+
+      <rect x="618" y="196" width="522" height="20" rx="5" fill="rgba(180,125,255,.12)" stroke="rgba(180,125,255,.3)"/>
+      <text x="879" y="210" fill="#c9a6ff" font-size="9.5" font-weight="800" text-anchor="middle">each block above = the &quot;Set project instructions&quot; field of one Claude Project</text>
+
+      <rect x="618" y="220" width="522" height="22" rx="6" fill="rgba(0,230,138,.09)" stroke="rgba(0,230,138,.25)"/>
+      <text x="630" y="235" fill="#a8f5d0" font-size="10" font-weight="700">Lives in Project instructions  ·  survives every chat, every day, every teammate</text>
+    </svg>
+
+    <!-- ══ THREE COLUMNS ══ -->
+    <div style="display:grid;grid-template-columns:.92fr 1.06fr .86fr;gap:16px;margin-top:16px">
+
+      <!-- COL 1 · the differences -->
+      <div class="r d4">
+        <div class="pill go" style="margin-bottom:9px">THE FIVE DIFFERENCES</div>
+        <div class="cmp">
+          <div class="hd">&nbsp;</div>
+          <div class="hd" style="color:#FFC145">RCTFX PROMPT</div>
+          <div class="hd" style="color:#00E68A">PIPELINE STAGE</div>
+
+          <div>Where it lives</div>
+          <div>The chat box</div>
+          <div>Project instructions</div>
+
+          <div>Life span</div>
+          <div>One message</div>
+          <div>Permanent</div>
+
+          <div>Input check</div>
+          <div>None — takes anything</div>
+          <div>Input requirement gate</div>
+
+          <div>Bad input</div>
+          <div>Confident guess</div>
+          <div>MALFORMED INPUT · halts</div>
+
+          <div>Scope</div>
+          <div>Can do many things</div>
+          <div>One verb. One deliverable.</div>
+
+          <div style="border-bottom:none">Who runs it</div>
+          <div style="border-bottom:none">You, manually</div>
+          <div style="border-bottom:none">The contract, automatically</div>
+        </div>
+
+        <div class="warnbox" style="margin-top:11px;font-size:11.5px">
+          <b>The trap:</b> students paste RCTFX into the <i>chat box</i> of a project instead of the
+          instructions field. It works once, then vanishes. If it is not in
+          <b>Set project instructions</b>, it is not a stage.
+        </div>
+      </div>
+
+      <!-- COL 2 · desktop setup -->
+      <div class="r d5">
+        <div class="pill cy" style="margin-bottom:9px">ON YOUR DESKTOP · DO THIS NOW</div>
+        <div class="stepnums">
+          <div class="snum" style="--acc:var(--cyan);padding:9px 12px"><div class="n">1</div>
+            <div><div class="t" style="font-size:12.5px">Open Claude → left sidebar → <b>Projects</b> → <b>+ New project</b></div>
+              <div class="hint">Desktop app or claude.ai — identical either way</div></div></div>
+
+          <div class="snum" style="--acc:var(--cyan);padding:9px 12px"><div class="n">2</div>
+            <div><div class="t" style="font-size:12.5px">Name it <b>number first</b>: <span class="mono" style="color:var(--cyan)">TS · Stage 1 · Gather</span></div>
+              <div class="hint">Numbers first = the three projects sort in pipeline order in your sidebar</div></div></div>
+
+          <div class="snum" style="--acc:var(--purple);padding:9px 12px"><div class="n">3</div>
+            <div><div class="t" style="font-size:12.5px">Inside the project, find <b>Set project instructions</b> and click it</div>
+              <div class="hint">NOT the chat box. This is the single most common mistake.</div></div></div>
+
+          <div class="snum" style="--acc:var(--purple);padding:9px 12px"><div class="n">4</div>
+            <div><div class="t" style="font-size:12.5px">Paste the <b>whole</b> Anatomy block — INPUT REQUIREMENT at the top, STOP CONDITION at the bottom</div>
+              <div class="hint">Order matters. The gate must be the first thing the model reads.</div></div></div>
+
+          <div class="snum" style="--acc:var(--gold);padding:9px 12px"><div class="n">5</div>
+            <div><div class="t" style="font-size:12.5px">Replace <b>every</b> [BRACKET]. Search the text for <span class="mono" style="color:var(--gold)">[</span> — zero results or you are not done</div>
+              <div class="hint">A surviving bracket means the stage is guessing its own job</div></div></div>
+
+          <div class="snum" style="--acc:var(--green);padding:9px 12px"><div class="n">6</div>
+            <div><div class="t" style="font-size:12.5px">Save → add reference files under <b>Project knowledge</b> → repeat 1–5 for Stage 2 and Stage 3</div>
+              <div class="hint">3 projects, 3 instruction blocks. That is your whole pipeline.</div></div></div>
+        </div>
+      </div>
+
+      <!-- COL 3 · proof + mockup -->
+      <div class="r d6">
+        <div class="pill gr" style="margin-bottom:9px">WHERE IT GOES</div>
+        <div class="ui" style="position:relative">
+          <div class="bar"><div class="dots"><i style="background:#FF5E5E"></i><i style="background:#FFC145"></i><i style="background:#00E68A"></i></div>
+            <div class="t">Claude — Projects</div></div>
+          <div class="body" style="padding:11px">
+            <div class="uirow" style="font-size:11px"><div class="ic">▤</div>TS · Stage 1 · Gather</div>
+            <div class="uilabel" style="margin:9px 0 6px">Set project instructions</div>
+            <div class="uifield active" style="font-size:10px;line-height:1.55">
+              <span style="color:var(--green);font-weight:700">INPUT REQUIREMENT</span><br>
+              This agent accepts ONLY…<br>
+              <span style="color:var(--purple);font-weight:700">ROLE / CONTEXT / TASK…</span><br>
+              <span style="color:var(--red);font-weight:700">STOP CONDITION</span><br>
+              If … return FLAG and stop.<span class="cursor"></span>
+            </div>
+            <div class="uilabel" style="margin:10px 0 6px">Project knowledge</div>
+            <div class="uirow" style="font-size:10.5px;margin:0"><div class="ic">📄</div>scorecard · brand rules</div>
+          </div>
+          <div class="ptr" style="left:-6px;top:96px">👉</div>
+        </div>
+
+        <div class="success" style="margin-top:11px;font-size:11.5px;line-height:1.5">
+          <b style="color:var(--white)">THE 10-SECOND PROOF</b><br>
+          Open a new chat <i>inside</i> Stage 2 and type just:
+          <span class="mono" style="color:var(--white)">hello</span><br><br>
+          ✓ Replies <b>MALFORMED INPUT</b> → gate is live.<br>
+          ✗ Answers helpfully → instructions did not save. Go back to step 3.
         </div>
       </div>
     </div>
