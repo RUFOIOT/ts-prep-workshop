@@ -592,13 +592,13 @@ If [FAILURE CASE], return [FLAG] and stop.</div>
 <b>ASK THE ROOM:</b> 'Who got MALFORMED INPUT?' Hands up. Anyone without a hand up needs help before you move on.">
   <div class="eyebrow r d1">SESSION 2 → SESSION 4</div>
   <h2 class="r d1">RCTFX vs. a <span class="grad">Pipeline Stage</span></h2>
-  <p class="sub r d2" style="margin-top:6px">Same six letters. Two completely different places on your desktop.</p>
-  <div class="rule r d2"></div>
+  <p class="sub r d2" style="margin-top:4px">Same six letters. Two completely different places on your desktop.</p>
+  <div class="rule r d2" style="margin:10px 0 12px"></div>
 
   <div class="flex1" style="justify-content:flex-start">
 
     <!-- ══ BIG COMPARISON DIAGRAM ══ -->
-    <svg viewBox="0 0 1180 248" class="r d3" style="width:100%;height:auto;max-height:31vh">
+    <svg viewBox="0 0 1180 248" class="r d3" style="width:100%;height:auto;aspect-ratio:1180/248;flex:none">
       <defs>
         <linearGradient id="goldf" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stop-color="rgba(255,193,69,.22)"/><stop offset="100%" stop-color="rgba(255,193,69,.02)"/>
@@ -705,7 +705,7 @@ If [FAILURE CASE], return [FLAG] and stop.</div>
     </svg>
 
     <!-- ══ THREE COLUMNS ══ -->
-    <div style="display:grid;grid-template-columns:.92fr 1.06fr .86fr;gap:16px;margin-top:16px">
+    <div style="display:grid;grid-template-columns:.92fr 1.06fr .86fr;gap:15px;margin-top:13px">
 
       <!-- COL 1 · the differences -->
       <div class="r d4">
@@ -750,28 +750,28 @@ If [FAILURE CASE], return [FLAG] and stop.</div>
       <!-- COL 2 · desktop setup -->
       <div class="r d5">
         <div class="pill cy" style="margin-bottom:9px">ON YOUR DESKTOP · DO THIS NOW</div>
-        <div class="stepnums">
-          <div class="snum" style="--acc:var(--cyan);padding:9px 12px"><div class="n">1</div>
+        <div class="stepnums" style="gap:6px">
+          <div class="snum" style="--acc:var(--cyan);padding:7px 12px"><div class="n">1</div>
             <div><div class="t" style="font-size:12.5px">Open Claude → left sidebar → <b>Projects</b> → <b>+ New project</b></div>
               <div class="hint">Desktop app or claude.ai — identical either way</div></div></div>
 
-          <div class="snum" style="--acc:var(--cyan);padding:9px 12px"><div class="n">2</div>
+          <div class="snum" style="--acc:var(--cyan);padding:7px 12px"><div class="n">2</div>
             <div><div class="t" style="font-size:12.5px">Name it <b>number first</b>: <span class="mono" style="color:var(--cyan)">TS · Stage 1 · Gather</span></div>
               <div class="hint">Numbers first = the three projects sort in pipeline order in your sidebar</div></div></div>
 
-          <div class="snum" style="--acc:var(--purple);padding:9px 12px"><div class="n">3</div>
+          <div class="snum" style="--acc:var(--purple);padding:7px 12px"><div class="n">3</div>
             <div><div class="t" style="font-size:12.5px">Inside the project, find <b>Set project instructions</b> and click it</div>
               <div class="hint">NOT the chat box. This is the single most common mistake.</div></div></div>
 
-          <div class="snum" style="--acc:var(--purple);padding:9px 12px"><div class="n">4</div>
+          <div class="snum" style="--acc:var(--purple);padding:7px 12px"><div class="n">4</div>
             <div><div class="t" style="font-size:12.5px">Paste the <b>whole</b> Anatomy block — INPUT REQUIREMENT at the top, STOP CONDITION at the bottom</div>
               <div class="hint">Order matters. The gate must be the first thing the model reads.</div></div></div>
 
-          <div class="snum" style="--acc:var(--gold);padding:9px 12px"><div class="n">5</div>
+          <div class="snum" style="--acc:var(--gold);padding:7px 12px"><div class="n">5</div>
             <div><div class="t" style="font-size:12.5px">Replace <b>every</b> [BRACKET]. Search the text for <span class="mono" style="color:var(--gold)">[</span> — zero results or you are not done</div>
               <div class="hint">A surviving bracket means the stage is guessing its own job</div></div></div>
 
-          <div class="snum" style="--acc:var(--green);padding:9px 12px"><div class="n">6</div>
+          <div class="snum" style="--acc:var(--green);padding:7px 12px"><div class="n">6</div>
             <div><div class="t" style="font-size:12.5px">Save → add reference files under <b>Project knowledge</b> → repeat 1–5 for Stage 2 and Stage 3</div>
               <div class="hint">3 projects, 3 instruction blocks. That is your whole pipeline.</div></div></div>
         </div>
